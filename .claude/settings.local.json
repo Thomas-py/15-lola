@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /c/Users/thoma/Desktop/QR-15/backend/services)",
+      "Bash(mkdir -p /c/Users/thoma/Desktop/QR-15/frontend/mobile)",
+      "Bash(mkdir -p /c/Users/thoma/Desktop/QR-15/frontend/screen)",
+      "Bash(git init:*)",
+      "Bash(git remote:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(ssh:*)",
+      "Bash(git branch:*)"
+    ]
+  }
+}
