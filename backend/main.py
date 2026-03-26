@@ -86,9 +86,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+FRONTEND_DIR = Path(os.getenv("FRONTEND_DIR", "/frontend"))
+
 app.mount("/photos", StaticFiles(directory=str(UPLOADS_DIR)), name="photos")
-app.mount("/mobile", StaticFiles(directory=str(BASE_DIR.parent / "frontend" / "mobile"), html=True), name="mobile")
-app.mount("/screen", StaticFiles(directory=str(BASE_DIR.parent / "frontend" / "screen"), html=True), name="screen")
+app.mount("/mobile", StaticFiles(directory=str(FRONTEND_DIR / "mobile"), html=True), name="mobile")
+app.mount("/screen", StaticFiles(directory=str(FRONTEND_DIR / "screen"), html=True), name="screen")
 
 
 # ─── Endpoints ───────────────────────────────────────────────────────────────

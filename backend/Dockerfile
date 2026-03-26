@@ -2,10 +2,15 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+# Dependencias primero (cache layer)
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Código backend
+COPY backend/ .
+
+# Frontend servido por FastAPI
+COPY frontend/ /frontend/
 
 RUN mkdir -p uploads
 
