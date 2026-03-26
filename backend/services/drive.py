@@ -1,8 +1,9 @@
 """
 Subida de fotos a Google Drive usando una Service Account.
 
-Las credenciales se leen desde la variable de entorno GOOGLE_SERVICE_ACCOUNT_B64
-(JSON de la service account codificado en base64).
+Prioridad de credenciales:
+1. GOOGLE_SERVICE_ACCOUNT_B64 — JSON codificado en base64 (recomendado para producción)
+2. GOOGLE_SERVICE_ACCOUNT_FILE — ruta al archivo JSON (fallback)
 """
 
 import base64
@@ -20,11 +21,15 @@ DRIVE_FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID", "")
 
 def _service():
     b64 = os.getenv("GOOGLE_SERVICE_ACCOUNT_B64", "")
-    if not b64:
-        raise RuntimeError("Falta la variable de entorno GOOGLE_SERVICE_ACCOUNT_B64")
+    if b64:
+        info = json.loads(base64.b64decode(b64).decode("utf-8"))
+        creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
+    else:
+        filepath = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE", "service_account.json")
+        if not Path(filepath).exists():
+            raise RuntimeError(f"No se encontró el archivo de credenciales: {filepath}")
+        creds = service_account.Credentials.from_service_account_file(filepath, scopes=SCOPES)
 
-    info = json.loads(base64.b64decode(b64).decode("utf-8"))
-    creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
     return build("drive", "v3", credentials=creds, cache_discovery=False)
 
 
