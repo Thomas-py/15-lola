@@ -1,11 +1,12 @@
 """
 Subida de fotos a Google Drive usando una Service Account.
 
-Configurar en .env:
-  GOOGLE_SERVICE_ACCOUNT_FILE=service_account.json
-  GOOGLE_DRIVE_FOLDER_ID=<id de la carpeta compartida>
+Las credenciales se leen desde la variable de entorno GOOGLE_SERVICE_ACCOUNT_B64
+(JSON de la service account codificado en base64).
 """
 
+import base64
+import json
 import os
 from pathlib import Path
 
@@ -14,14 +15,16 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
-SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE", "service_account.json")
 DRIVE_FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID", "")
 
 
 def _service():
-    creds = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES
-    )
+    b64 = os.getenv("GOOGLE_SERVICE_ACCOUNT_B64", "")
+    if not b64:
+        raise RuntimeError("Falta la variable de entorno GOOGLE_SERVICE_ACCOUNT_B64")
+
+    info = json.loads(base64.b64decode(b64).decode("utf-8"))
+    creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
     return build("drive", "v3", credentials=creds, cache_discovery=False)
 
 
