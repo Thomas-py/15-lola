@@ -20,8 +20,10 @@ DRIVE_FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID", "")
 
 
 def _service():
-    b64 = os.getenv("GOOGLE_SERVICE_ACCOUNT_B64", "")
+    b64 = os.getenv("GOOGLE_SERVICE_ACCOUNT_B64", "").strip()
     if b64:
+        # Agregar padding si falta
+        b64 += "=" * (-len(b64) % 4)
         info = json.loads(base64.b64decode(b64).decode("utf-8"))
         creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
     else:

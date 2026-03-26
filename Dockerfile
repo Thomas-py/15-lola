@@ -12,6 +12,10 @@ COPY backend/ .
 # Frontend servido por FastAPI
 COPY frontend/ /frontend/
 
+# Script de inicio
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 RUN mkdir -p uploads
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+ENTRYPOINT ["/entrypoint.sh"]
