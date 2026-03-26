@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XV de Cata — Pantalla</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7b2fff;
+      --pink:   #ff4db8;
+      --gold:   #ffd700;
+      --bg:     #0d0621;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #fff;
+      cursor: none;
+    }
+
+    /* ── Contenedor de foto ── */
+    #photoWrap {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    #photoImg {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity .6s ease;
+      border-radius: 4px;
+      /* Sutil vignette */
+      box-shadow: 0 0 120px rgba(0,0,0,.6);
+    }
+    #photoImg.visible { opacity: 1; }
+
+    /* ── Overlay superior ── */
+    #topBar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: linear-gradient(to bottom, rgba(13,6,33,.9) 0%, transparent 100%);
+      z-index: 10;
+      transition: opacity .4s;
+    }
+
+    .event-name {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gold), #ff9f43);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+    .event-sub {
+      font-size: .8rem;
+      color: rgba(255,255,255,.5);
+      margin-top: 2px;
+    }
+
+    #photoCount {
+      text-align: right;
+      font-size: .85rem;
+      color: rgba(255,255,255,.5);
+    }
+    #photoCount span {
+      display: block;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: rgba(255,255,255,.85);
+      line-height: 1;
+    }
+
+    /* ── Barra de tiempo ── */
+    #timerBar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: rgba(255,255,255,.1);
+      z-index: 10;
+    }
+    #timerFill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+      transition: width linear;
+    }
+
+    /* ── Overlay inferior ── */
+    #bottomBar {
+      position: fixed;
+      bottom: 8px; left: 0; right: 0;
+      padding: 32px;
+      background: linear-gradient(to top, rgba(13,6,33,.85) 0%, transparent 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 10;
+    }
+
+    /* ── QR hint ── */
+    .qr-hint {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,.07);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 12px 16px;
+    }
+    .qr-icon { font-size: 2.2rem; }
+    .qr-text { font-size: .8rem; line-height: 1.4; }
+    .qr-text strong { display: block; font-size: .95rem; }
+
+    /* ── Pantalla de espera (sin fotos aún) ── */
+    #idle {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 20;
+      background: var(--bg);
+      transition: opacity .6s;
+    }
+    #idle.hidden { opacity: 0; pointer-events: none; }
+
+    .idle-crown {
+      font-size: 80px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+    .idle-title {
+      font-size: 2.6rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+    }
+    .idle-sub {
+      font-size: 1rem;
+      color: rgba(255,255,255,.5);
+      text-align: center;
+    }
+
+    /* ── Fondo animado ── */
+    .bg-orbs {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: .35;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .orb1 { width: 500px; height: 500px; background: var(--purple); top: -100px; left: -100px; animation-duration: 14s; }
+    .orb2 { width: 400px; height: 400px; background: var(--pink);   bottom: -80px; right: -80px; animation-duration: 10s; }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(60px, 40px) scale(1.1); }
+    }
+
+    /* ── Badge "nueva foto" ── */
+    #newBadge {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 12px 28px;
+      border-radius: 99px;
+      z-index: 30;
+      pointer-events: none;
+      transition: transform .3s cubic-bezier(.175,.885,.32,1.275), opacity .3s;
+      opacity: 0;
+    }
+    #newBadge.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+</div>
+
+<!-- Pantalla de espera -->
+<div id="idle">
+  <div class="idle-crown">👑</div>
+  <div class="idle-title">XV de Cata</div>
+  <div class="idle-sub">Escaneá el QR y enviá tu foto 📷</div>
+</div>
+
+<!-- Foto actual -->
+<div id="photoWrap">
+  <img id="photoImg" src="" alt="" />
+</div>
+
+<!-- Barra superior -->
+<div id="topBar">
+  <div>
+    <div class="event-name">✨ XV de Cata</div>
+    <div class="event-sub">Fotos del festejo</div>
+  </div>
+  <div id="photoCount">
+    Fotos<span id="countNum">0</span>
+  </div>
+</div>
+
+<!-- Barra inferior -->
+<div id="bottomBar">
+  <div class="qr-hint">
+    <div class="qr-icon">📷</div>
+    <div class="qr-text">
+      <strong>¡Sumate!</strong>
+      Escaneá el QR y<br>enviá tu foto
+    </div>
+  </div>
+</div>
+
+<!-- Barra de tiempo -->
+<div id="timerBar"><div id="timerFill" style="width:100%"></div></div>
+
+<!-- Badge "Nueva foto" -->
+<div id="newBadge">📸 Nueva foto</div>
+
+<script>
+  // ── Config ────────────────────────────────────────────────────────────────
+  const API_BASE      = window.location.origin;
+  const WS_URL        = API_BASE.replace(/^http/, 'ws') + '/ws/screen';
+  const DISPLAY_MS    = 8000;   // segundos que se muestra cada foto
+  const POLL_INTERVAL = 5000;   // polling fallback (ms)
+
+  // ── Estado ────────────────────────────────────────────────────────────────
+  const queue       = [];
+  let showing       = false;
+  let totalCount    = 0;
+  let wsReady       = false;
+  let timerTimeout  = null;
+
+  // ── WebSocket ─────────────────────────────────────────────────────────────
+  function connectWS() {
+    const ws = new WebSocket(WS_URL);
+
+    ws.onopen = () => {
+      console.log('[WS] Conectado');
+      wsReady = true;
+    };
+
+    ws.onmessage = e => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'init') {
+        msg.photos.forEach(p => enqueue(p));
+      } else if (msg.type === 'new_photo') {
+        enqueue(msg.photo);
+        flashBadge();
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('[WS] Desconectado — reintentando en 3s');
+      wsReady = false;
+      setTimeout(connectWS, 3000);
+    };
+
+    ws.onerror = err => {
+      console.error('[WS] Error:', err);
+      ws.close();
+    };
+
+    // Ping cada 20s para mantener la conexión viva
+    setInterval(() => { if (ws.readyState === 1) ws.send('ping'); }, 20000);
+  }
+
+  // ── Polling fallback ──────────────────────────────────────────────────────
+  let knownIds = new Set();
+
+  async function pollQueue() {
+    try {
+      const res  = await fetch(`${API_BASE}/queue`);
+      const data = await res.json();
+      data.photos.forEach(p => {
+        if (!knownIds.has(p.id)) enqueue(p);
+      });
+    } catch (_) {}
+  }
+
+  // Si no hay WS en 5s, activar polling
+  setTimeout(() => {
+    if (!wsReady) {
+      console.log('[Poll] WebSocket no disponible — activando polling');
+      pollQueue();
+      setInterval(pollQueue, POLL_INTERVAL);
+    }
+  }, 5000);
+
+  // ── Cola ──────────────────────────────────────────────────────────────────
+  function enqueue(photo) {
+    if (knownIds.has(photo.id)) return;
+    knownIds.add(photo.id);
+    queue.push(photo);
+    totalCount++;
+    document.getElementById('countNum').textContent = totalCount;
+    if (!showing) showNext();
+  }
+
+  function showNext() {
+    if (queue.length === 0) {
+      showing = false;
+      return;
+    }
+    showing = true;
+    const photo = queue.shift();
+    displayPhoto(photo);
+  }
+
+  // ── Mostrar foto ──────────────────────────────────────────────────────────
+  function displayPhoto(photo) {
+    const img  = document.getElementById('photoImg');
+    const idle = document.getElementById('idle');
+    const fill = document.getElementById('timerFill');
+
+    // Ocultar idle screen
+    idle.classList.add('hidden');
+
+    // Ocultar imagen actual
+    img.classList.remove('visible');
+
+    // Cargar nueva
+    const url = API_BASE + photo.url;
+    const tmp = new Image();
+    tmp.onload = () => {
+      img.src = url;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          img.classList.add('visible');
+        });
+      });
+    };
+    tmp.onerror = () => {
+      // Si falla la carga, saltar al siguiente
+      setTimeout(showNext, 1000);
+    };
+    tmp.src = url;
+
+    // Timer bar
+    if (timerTimeout) clearTimeout(timerTimeout);
+    fill.style.transition = 'none';
+    fill.style.width = '100%';
+    requestAnimationFrame(() => {
+      fill.style.transition = `width ${DISPLAY_MS}ms linear`;
+      fill.style.width = '0%';
+    });
+
+    timerTimeout = setTimeout(showNext, DISPLAY_MS);
+  }
+
+  // ── Badge "Nueva foto" ────────────────────────────────────────────────────
+  function flashBadge() {
+    const badge = document.getElementById('newBadge');
+    badge.classList.add('show');
+    setTimeout(() => badge.classList.remove('show'), 2000);
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  connectWS();
+
+  // Fullscreen al click/touch
+  document.addEventListener('click', () => {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  });
+</script>
+</body>
+</html>

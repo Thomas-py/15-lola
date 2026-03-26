@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1a0a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>XV de Cata 🌸</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7b2fff;
+      --pink:   #ff4db8;
+      --gold:   #ffd700;
+      --bg:     #0d0621;
+      --card:   #1a0a38;
+      --text:   #f0e6ff;
+      --sub:    #a78cc0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── Fondo animado ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(123,47,255,.25) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(255,77,184,.2) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Layout ── */
+    #app {
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px 40px;
+      gap: 0;
+    }
+
+    /* ── Screens ── */
+    .screen { display: none; width: 100%; max-width: 420px; }
+    .screen.active { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+    /* ── Decoración superior ── */
+    .crown {
+      font-size: 56px;
+      line-height: 1;
+      filter: drop-shadow(0 0 16px rgba(255,215,0,.5));
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    .title {
+      text-align: center;
+      line-height: 1.1;
+    }
+    .title h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .title p {
+      font-size: .95rem;
+      color: var(--sub);
+      margin-top: 6px;
+    }
+
+    /* ── Botón principal ── */
+    .btn {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(123,47,255,.4);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--sub);
+      border: 1px solid rgba(167,140,192,.3);
+    }
+
+    /* ── Input cámara oculto ── */
+    #cameraInput { display: none; }
+
+    /* ── Preview de foto ── */
+    #previewImg {
+      width: 100%;
+      max-height: 55dvh;
+      object-fit: contain;
+      border-radius: 16px;
+      border: 2px solid rgba(123,47,255,.4);
+      background: #0d0621;
+    }
+
+    /* ── Barra de progreso ── */
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,.1);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+      border-radius: 99px;
+      transition: width .1s linear;
+    }
+
+    /* ── Estado de éxito ── */
+    .success-icon {
+      font-size: 72px;
+      animation: pop .4s cubic-bezier(.175,.885,.32,1.275);
+    }
+    @keyframes pop {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .success-text {
+      text-align: center;
+    }
+    .success-text h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gold), #ff9f43);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .success-text p {
+      color: var(--sub);
+      margin-top: 8px;
+      font-size: .95rem;
+    }
+
+    /* ── Error ── */
+    .error-msg {
+      background: rgba(255,60,60,.15);
+      border: 1px solid rgba(255,60,60,.3);
+      color: #ff8080;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: .9rem;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      position: fixed;
+      bottom: 16px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: .75rem;
+      color: rgba(167,140,192,.4);
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── PANTALLA 1: Inicio ── -->
+  <div id="s-home" class="screen active">
+    <div class="crown">👑</div>
+    <div class="title">
+      <h1>XV de Cata</h1>
+      <p>Sacá tu foto y aparecé en la pantalla</p>
+    </div>
+    <button class="btn btn-primary" onclick="openCamera()">📷 Tomar foto</button>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" />
+  </div>
+
+  <!-- ── PANTALLA 2: Preview ── -->
+  <div id="s-preview" class="screen">
+    <img id="previewImg" src="" alt="Vista previa" />
+    <button class="btn btn-primary" onclick="sendPhoto()">Enviar a la pantalla 🚀</button>
+    <button class="btn btn-secondary" onclick="openCamera()">Volver a tomar</button>
+    <div id="uploadError" class="error-msg" style="display:none"></div>
+  </div>
+
+  <!-- ── PANTALLA 3: Enviando ── -->
+  <div id="s-loading" class="screen">
+    <div class="crown" style="animation:none; font-size:48px">⏳</div>
+    <div class="title">
+      <h1>Enviando...</h1>
+      <p>Ya casi aparece en pantalla</p>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- ── PANTALLA 4: Éxito ── -->
+  <div id="s-success" class="screen">
+    <div class="success-icon">🎉</div>
+    <div class="success-text">
+      <h2>¡Apareciste!</h2>
+      <p>Tu foto ya está en la pantalla del salón</p>
+    </div>
+    <button class="btn btn-primary" onclick="goHome()">Tomar otra foto 📷</button>
+  </div>
+
+</div>
+
+<div class="footer">Hecho con 💜 para los XV de Cata</div>
+
+<script>
+  // ── Config ────────────────────────────────────────────────────────────────
+  const API_BASE = window.location.origin;  // misma URL donde está hosteado el backend
+
+  // ── Estado ────────────────────────────────────────────────────────────────
+  let selectedFile = null;
+
+  // ── Cámara ────────────────────────────────────────────────────────────────
+  function openCamera() {
+    const input = document.getElementById('cameraInput');
+    input.value = '';
+    input.click();
+  }
+
+  document.getElementById('cameraInput').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    compressImage(file, 1920, 0.82).then(blob => {
+      selectedFile = new File([blob], file.name, { type: blob.type });
+      const url = URL.createObjectURL(blob);
+      document.getElementById('previewImg').src = url;
+      showScreen('s-preview');
+    });
+  });
+
+  // ── Compresión client-side ────────────────────────────────────────────────
+  function compressImage(file, maxPx, quality) {
+    return new Promise(resolve => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          const ratio = Math.min(maxPx / w, maxPx / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(resolve, 'image/jpeg', quality);
+      };
+      img.src = url;
+    });
+  }
+
+  // ── Subida ────────────────────────────────────────────────────────────────
+  function sendPhoto() {
+    if (!selectedFile) return;
+    showScreen('s-loading');
+
+    const form = new FormData();
+    form.append('file', selectedFile, selectedFile.name);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${API_BASE}/upload`);
+
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        document.getElementById('progressFill').style.width = pct + '%';
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        showScreen('s-success');
+      } else {
+        let msg = 'Error al enviar la foto. Intentá de nuevo.';
+        try { msg = JSON.parse(xhr.responseText).detail || msg; } catch (_) {}
+        showError(msg);
+      }
+    };
+
+    xhr.onerror = () => showError('Sin conexión. Verificá tu red e intentá de nuevo.');
+    xhr.send(form);
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('uploadError');
+    el.textContent = msg;
+    el.style.display = 'block';
+    showScreen('s-preview');
+  }
+
+  function goHome() {
+    selectedFile = null;
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('uploadError').style.display = 'none';
+    showScreen('s-home');
+  }
+</script>
+</body>
+</html>
