@@ -44,5 +44,10 @@ def upload_file(file_path: Path, filename: str) -> str:
         metadata["parents"] = [DRIVE_FOLDER_ID]
 
     media = MediaFileUpload(str(file_path), resumable=True)
-    result = svc.files().create(body=metadata, media_body=media, fields="id").execute()
+    result = svc.files().create(
+        body=metadata,
+        media_body=media,
+        fields="id",
+        supportsAllDrives=True,
+    ).execute()
     return result["id"]
