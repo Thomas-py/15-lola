@@ -149,7 +149,7 @@ async def ws_screen(ws: WebSocket):
     await manager.connect(ws)
     try:
         # Enviar cola actual al conectar
-        await ws.send_json({"type": "init", "photos": photo_queue})
+        await ws.send_json({"type": "init", "photos": []})
         while True:
             # Mantener viva la conexión; el cliente puede enviar pings
             await ws.receive_text()
