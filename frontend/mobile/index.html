@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --purple:   #7B5EA7;
       --lavender: #B39DDB;
@@ -17,254 +16,201 @@
       --gold2:    #E8A020;
       --pink:     #E8A0B4;
       --bg:       #1C0F3F;
-      --card:     #2A1A5A;
       --text:     #F0E8FF;
       --sub:      #B39DDB;
     }
+    html, body { height: 100%; font-family: 'Lato', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-    html, body {
-      height: 100%;
-      font-family: 'Lato', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-    }
-
-    /* ── Fondo con linternas ── */
-    .lanterns {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .lantern {
-      position: absolute;
-      border-radius: 50% 50% 45% 45%;
-      opacity: 0;
-      animation: rise linear infinite;
-    }
-    .lantern::after {
-      content: '';
-      position: absolute;
-      bottom: -6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 2px;
-      height: 8px;
-      background: currentColor;
-      opacity: .5;
-    }
+    /* Linternas */
+    .lanterns { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .lantern { position: absolute; border-radius: 50% 50% 45% 45%; opacity: 0; animation: rise linear infinite; }
     @keyframes rise {
-      0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+      0%   { transform: translateY(0); opacity: 0; }
       10%  { opacity: .7; }
       90%  { opacity: .4; }
-      100% { transform: translateY(-110vh) translateX(30px) scale(.8); opacity: 0; }
+      100% { transform: translateY(-110vh) translateX(30px); opacity: 0; }
     }
-    .l1  { width:18px; height:24px; background:#F4C430; bottom:-30px; left:10%;  animation-duration:9s;  animation-delay:0s; }
-    .l2  { width:14px; height:18px; background:#E8A0B4; bottom:-30px; left:30%;  animation-duration:12s; animation-delay:2s; }
-    .l3  { width:20px; height:26px; background:#F4C430; bottom:-30px; left:55%;  animation-duration:8s;  animation-delay:4s; }
-    .l4  { width:12px; height:16px; background:#B39DDB; bottom:-30px; left:75%;  animation-duration:11s; animation-delay:1s; }
-    .l5  { width:16px; height:22px; background:#F4C430; bottom:-30px; left:88%;  animation-duration:10s; animation-delay:3s; }
-    .l6  { width:10px; height:14px; background:#E8A0B4; bottom:-30px; left:20%;  animation-duration:13s; animation-delay:5s; }
-    .l7  { width:22px; height:28px; background:#F4C430; bottom:-30px; left:65%;  animation-duration:7s;  animation-delay:6s; }
-    .l8  { width:14px; height:18px; background:#B39DDB; bottom:-30px; left:45%;  animation-duration:14s; animation-delay:0.5s; }
+    .l1 { width:18px; height:24px; background:#F4C430; bottom:-30px; left:10%; animation-duration:9s;  animation-delay:0s; }
+    .l2 { width:14px; height:18px; background:#E8A0B4; bottom:-30px; left:30%; animation-duration:12s; animation-delay:2s; }
+    .l3 { width:20px; height:26px; background:#F4C430; bottom:-30px; left:55%; animation-duration:8s;  animation-delay:4s; }
+    .l4 { width:12px; height:16px; background:#B39DDB; bottom:-30px; left:75%; animation-duration:11s; animation-delay:1s; }
+    .l5 { width:16px; height:22px; background:#F4C430; bottom:-30px; left:88%; animation-duration:10s; animation-delay:3s; }
 
-    /* ── Gradiente de fondo ── */
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 30% 10%, rgba(123,94,167,.35) 0%, transparent 55%),
-        radial-gradient(ellipse at 80% 80%, rgba(244,196,48,.12) 0%, transparent 55%);
-      z-index: 0;
-      pointer-events: none;
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 30% 10%, rgba(123,94,167,.35) 0%, transparent 55%),
+                  radial-gradient(ellipse at 80% 80%, rgba(244,196,48,.12) 0%, transparent 55%);
+      z-index: 0; pointer-events: none;
     }
 
-    /* ── Layout ── */
-    #app {
-      position: relative;
-      z-index: 1;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 24px 48px;
-    }
-
+    #app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 24px 48px; }
     .screen { display: none; width: 100%; max-width: 400px; }
     .screen.active { display: flex; flex-direction: column; align-items: center; gap: 20px; }
 
-    /* ── Sol de Rapunzel ── */
-    .sun {
-      font-size: 54px;
-      line-height: 1;
-      animation: float 4s ease-in-out infinite;
-      filter: drop-shadow(0 0 20px rgba(244,196,48,.6));
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(-3deg); }
-      50%       { transform: translateY(-10px) rotate(3deg); }
-    }
+    .sun { font-size: 54px; line-height: 1; animation: float 4s ease-in-out infinite; filter: drop-shadow(0 0 20px rgba(244,196,48,.6)); }
+    @keyframes float { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
 
-    /* ── Título ── */
     .title { text-align: center; }
-    .title h1 {
-      font-family: 'Cinzel', serif;
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--gold);
-      text-shadow: 0 0 30px rgba(244,196,48,.5);
-      letter-spacing: .05em;
-      line-height: 1.1;
-    }
-    .title .subtitle {
-      font-size: .9rem;
-      color: var(--sub);
-      margin-top: 8px;
-      font-weight: 300;
-      letter-spacing: .02em;
-    }
+    .title h1 { font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 700; color: var(--gold); text-shadow: 0 0 30px rgba(244,196,48,.5); letter-spacing: .05em; }
+    .title .subtitle { font-size: .9rem; color: var(--sub); margin-top: 8px; font-weight: 300; }
 
-    /* ── Divisor floral ── */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-      color: var(--lavender);
-      opacity: .5;
-      font-size: .8rem;
-      letter-spacing: .1em;
-    }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--lavender), transparent);
-    }
+    .divider { display: flex; align-items: center; gap: 10px; width: 100%; color: var(--lavender); opacity: .5; font-size: .8rem; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--lavender), transparent); }
 
-    /* ── Botones ── */
-    .btn {
-      width: 100%;
-      padding: 17px;
-      border: none;
-      border-radius: 50px;
-      font-family: 'Lato', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      letter-spacing: .05em;
-      transition: transform .15s, box-shadow .15s;
-      -webkit-tap-highlight-color: transparent;
-    }
+    .btn { width: 100%; padding: 17px; border: none; border-radius: 50px; font-family: 'Lato', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; letter-spacing: .05em; transition: transform .15s, box-shadow .15s; -webkit-tap-highlight-color: transparent; }
     .btn:active { transform: scale(.97); }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--gold2), var(--gold));
-      color: #1C0F3F;
-      box-shadow: 0 6px 28px rgba(244,196,48,.35);
-    }
-    .btn-secondary {
-      background: rgba(179,157,219,.12);
-      color: var(--lavender);
-      border: 1px solid rgba(179,157,219,.3);
-    }
+    .btn-primary { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #1C0F3F; box-shadow: 0 6px 28px rgba(244,196,48,.35); }
+    .btn-secondary { background: rgba(179,157,219,.12); color: var(--lavender); border: 1px solid rgba(179,157,219,.3); }
 
     #cameraInput { display: none; }
 
-    /* ── Preview ── */
-    #previewImg {
-      width: 100%;
-      max-height: 52dvh;
-      object-fit: contain;
-      border-radius: 20px;
-      border: 2px solid rgba(244,196,48,.3);
-      background: #0d0621;
-      box-shadow: 0 8px 40px rgba(0,0,0,.4);
-    }
+    #previewImg { width: 100%; max-height: 52dvh; object-fit: contain; border-radius: 20px; border: 2px solid rgba(244,196,48,.3); background: #0d0621; box-shadow: 0 8px 40px rgba(0,0,0,.4); }
 
-    /* ── Progress ── */
-    .progress-bar {
-      width: 100%;
-      height: 3px;
-      background: rgba(255,255,255,.1);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--purple), var(--gold));
-      border-radius: 99px;
-      transition: width .1s linear;
-    }
+    .progress-bar { width: 100%; height: 3px; background: rgba(255,255,255,.1); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--gold)); border-radius: 99px; transition: width .1s linear; }
 
-    /* ── Éxito ── */
-    .success-icon {
-      font-size: 68px;
-      animation: pop .4s cubic-bezier(.175,.885,.32,1.275);
-    }
-    @keyframes pop {
-      from { transform: scale(0); opacity: 0; }
-      to   { transform: scale(1); opacity: 1; }
-    }
+    .success-icon { font-size: 68px; animation: pop .4s cubic-bezier(.175,.885,.32,1.275); }
+    @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .success-text { text-align: center; }
-    .success-text h2 {
+    .success-text h2 { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--gold); }
+    .success-text p { color: var(--sub); margin-top: 8px; font-size: .9rem; font-weight: 300; }
+
+    .error-msg { background: rgba(255,60,60,.12); border: 1px solid rgba(255,60,60,.25); color: #ff9090; padding: 12px 16px; border-radius: 12px; font-size: .85rem; text-align: center; width: 100%; }
+
+    /* ── Overlay de votación ── */
+    #voteOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(28,15,63,.96);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 0 40px;
+      backdrop-filter: blur(8px);
+    }
+    #voteOverlay.show { display: flex; animation: slideUp .4s cubic-bezier(.175,.885,.32,1.275); }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+    #votePhoto {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .25;
+    }
+
+    .vote-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 400px;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .vote-label {
       font-family: 'Cinzel', serif;
-      font-size: 1.5rem;
+      font-size: 1rem;
       color: var(--gold);
+      text-align: center;
+      letter-spacing: .08em;
       text-shadow: 0 0 20px rgba(244,196,48,.4);
     }
-    .success-text p {
-      color: var(--sub);
-      margin-top: 8px;
-      font-size: .9rem;
-      font-weight: 300;
-    }
+    .vote-sublabel { font-size: .8rem; color: var(--sub); text-align: center; font-weight: 300; }
 
-    /* ── Error ── */
-    .error-msg {
-      background: rgba(255,60,60,.12);
-      border: 1px solid rgba(255,60,60,.25);
-      color: #ff9090;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: .85rem;
-      text-align: center;
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
       width: 100%;
     }
-
-    /* ── Footer ── */
-    .footer {
-      position: fixed;
-      bottom: 14px;
-      left: 0; right: 0;
-      text-align: center;
-      font-size: .7rem;
-      color: rgba(179,157,219,.3);
-      letter-spacing: .05em;
-      z-index: 1;
+    .emoji-btn {
+      background: rgba(255,255,255,.08);
+      border: 2px solid rgba(255,255,255,.15);
+      border-radius: 16px;
+      padding: 16px 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: transform .15s, background .15s, border-color .15s;
+      -webkit-tap-highlight-color: transparent;
     }
+    .emoji-btn:active { transform: scale(.9); }
+    .emoji-btn.voted {
+      background: rgba(244,196,48,.2);
+      border-color: var(--gold);
+    }
+    .emoji-btn .emoji { font-size: 2rem; line-height: 1; }
+    .emoji-btn .count { font-size: .75rem; color: var(--lavender); font-weight: 700; }
+
+    .vote-done {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+      text-align: center;
+      display: none;
+    }
+    .vote-done.show { display: block; animation: pop .3s cubic-bezier(.175,.885,.32,1.275); }
+
+    .vote-close {
+      background: none;
+      border: 1px solid rgba(179,157,219,.3);
+      color: var(--sub);
+      border-radius: 99px;
+      padding: 10px 28px;
+      font-size: .85rem;
+      cursor: pointer;
+      font-family: 'Lato', sans-serif;
+    }
+
+    .footer { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: .7rem; color: rgba(179,157,219,.3); letter-spacing: .05em; z-index: 1; }
   </style>
 </head>
 <body>
 
-<!-- Linternas flotantes -->
 <div class="lanterns">
-  <div class="lantern l1"></div>
-  <div class="lantern l2"></div>
-  <div class="lantern l3"></div>
-  <div class="lantern l4"></div>
+  <div class="lantern l1"></div><div class="lantern l2"></div>
+  <div class="lantern l3"></div><div class="lantern l4"></div>
   <div class="lantern l5"></div>
-  <div class="lantern l6"></div>
-  <div class="lantern l7"></div>
-  <div class="lantern l8"></div>
+</div>
+
+<!-- Overlay de votación -->
+<div id="voteOverlay">
+  <img id="votePhoto" src="" alt="" />
+  <div class="vote-content">
+    <div>
+      <div class="vote-label">✨ Foto en pantalla</div>
+      <div class="vote-sublabel">¿Qué te pareció?</div>
+    </div>
+    <div class="emoji-grid" id="emojiGrid">
+      <button class="emoji-btn" data-emoji="❤️" onclick="castVote('❤️')">
+        <span class="emoji">❤️</span><span class="count" id="cnt-heart">0</span>
+      </button>
+      <button class="emoji-btn" data-emoji="🔥" onclick="castVote('🔥')">
+        <span class="emoji">🔥</span><span class="count" id="cnt-fire">0</span>
+      </button>
+      <button class="emoji-btn" data-emoji="😂" onclick="castVote('😂')">
+        <span class="emoji">😂</span><span class="count" id="cnt-laugh">0</span>
+      </button>
+      <button class="emoji-btn" data-emoji="😮" onclick="castVote('😮')">
+        <span class="emoji">😮</span><span class="count" id="cnt-wow">0</span>
+      </button>
+    </div>
+    <div class="vote-done" id="voteDone">¡Gracias por votar! 🏮</div>
+    <button class="vote-close" onclick="closeVote()">Cerrar</button>
+  </div>
 </div>
 
 <div id="app">
-
   <!-- INICIO -->
   <div id="s-home" class="screen active">
     <div class="sun">✨</div>
@@ -287,7 +233,7 @@
 
   <!-- ENVIANDO -->
   <div id="s-loading" class="screen">
-    <div class="sun" style="animation:none; font-size:44px">🏮</div>
+    <div class="sun" style="animation:none;font-size:44px">🏮</div>
     <div class="title">
       <h1>Enviando...</h1>
       <div class="subtitle">Ya casi aparece en pantalla</div>
@@ -305,15 +251,107 @@
     <div class="divider">✨ ✨ ✨</div>
     <button class="btn btn-primary" onclick="goHome()">Tomar otra foto 📷</button>
   </div>
-
 </div>
 
 <div class="footer">✦ XV de Lola ✦</div>
 
 <script>
   const API_BASE = window.location.origin;
-  let selectedFile = null;
+  const WS_URL   = API_BASE.replace(/^http/, 'ws') + '/ws/mobile';
 
+  let selectedFile    = null;
+  let currentPhotoId  = null;
+  let hasVoted        = false;
+
+  const EMOJI_IDS = { '❤️': 'cnt-heart', '🔥': 'cnt-fire', '😂': 'cnt-laugh', '😮': 'cnt-wow' };
+
+  // ── WebSocket móvil ──────────────────────────────────────────────────────
+  function connectMobileWS() {
+    const ws = new WebSocket(WS_URL);
+
+    ws.onmessage = e => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'now_showing') {
+        showVoteOverlay(msg.photo);
+      }
+    };
+
+    ws.onclose = () => setTimeout(connectMobileWS, 3000);
+    ws.onerror = () => ws.close();
+    setInterval(() => { if (ws.readyState === 1) ws.send('ping'); }, 20000);
+  }
+  connectMobileWS();
+
+  // ── Overlay de votación ──────────────────────────────────────────────────
+  function showVoteOverlay(photo) {
+    if (!photo) return;
+
+    const key = 'voted_' + photo.id;
+    hasVoted = !!localStorage.getItem(key);
+    currentPhotoId = photo.id;
+
+    // Foto de fondo
+    document.getElementById('votePhoto').src = API_BASE + photo.url;
+
+    // Actualizar contadores
+    const v = photo.votes || {};
+    document.getElementById('cnt-heart').textContent  = v['❤️'] || 0;
+    document.getElementById('cnt-fire').textContent   = v['🔥'] || 0;
+    document.getElementById('cnt-laugh').textContent  = v['😂'] || 0;
+    document.getElementById('cnt-wow').textContent    = v['😮'] || 0;
+
+    // Estado botones
+    document.querySelectorAll('.emoji-btn').forEach(btn => {
+      btn.classList.remove('voted');
+      btn.disabled = hasVoted;
+    });
+    if (hasVoted) {
+      const myEmoji = localStorage.getItem(key);
+      document.querySelector(`[data-emoji="${myEmoji}"]`)?.classList.add('voted');
+    }
+
+    const donEl = document.getElementById('voteDone');
+    donEl.classList.toggle('show', hasVoted);
+
+    document.getElementById('voteOverlay').classList.add('show');
+  }
+
+  function closeVote() {
+    document.getElementById('voteOverlay').classList.remove('show');
+  }
+
+  async function castVote(emoji) {
+    if (!currentPhotoId || hasVoted) return;
+
+    const key = 'voted_' + currentPhotoId;
+    localStorage.setItem(key, emoji);
+    hasVoted = true;
+
+    // Marcar botón
+    document.querySelectorAll('.emoji-btn').forEach(btn => {
+      btn.disabled = true;
+      if (btn.dataset.emoji === emoji) btn.classList.add('voted');
+    });
+    document.getElementById('voteDone').classList.add('show');
+
+    // Enviar al servidor
+    try {
+      const res = await fetch(`${API_BASE}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photo_id: currentPhotoId, emoji }),
+      });
+      const data = await res.json();
+      // Actualizar contador del emoji votado
+      const cntId = EMOJI_IDS[emoji];
+      if (cntId) document.getElementById(cntId).textContent = data.total || '';
+    } catch (_) {}
+
+    // Cerrar automáticamente después de 3s
+    setTimeout(closeVote, 3000);
+  }
+
+  // ── Cámara ───────────────────────────────────────────────────────────────
   function openCamera() {
     const input = document.getElementById('cameraInput');
     input.value = '';
@@ -339,8 +377,7 @@
         let w = img.width, h = img.height;
         if (w > maxPx || h > maxPx) {
           const ratio = Math.min(maxPx / w, maxPx / h);
-          w = Math.round(w * ratio);
-          h = Math.round(h * ratio);
+          w = Math.round(w * ratio); h = Math.round(h * ratio);
         }
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
@@ -380,8 +417,7 @@
   }
   function showError(msg) {
     const el = document.getElementById('uploadError');
-    el.textContent = msg;
-    el.style.display = 'block';
+    el.textContent = msg; el.style.display = 'block';
     showScreen('s-preview');
   }
   function goHome() {

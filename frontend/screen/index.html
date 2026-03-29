@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>XV de Lola — Pantalla</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --purple:   #7B5EA7;
       --lavender: #B39DDB;
@@ -16,254 +15,123 @@
       --pink:     #E8A0B4;
       --bg:       #1C0F3F;
     }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Lato', sans-serif; color: #fff; cursor: none; }
 
-    html, body {
-      width: 100%; height: 100%;
-      overflow: hidden;
-      background: var(--bg);
-      font-family: 'Lato', sans-serif;
-      color: #fff;
-      cursor: none;
-    }
-
-    /* ── Orbes de fondo ── */
+    /* Orbes */
     .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(90px);
-      opacity: .3;
-      animation: drift ease-in-out infinite alternate;
-    }
-    .orb1 { width: 600px; height: 600px; background: var(--purple); top: -150px; left: -100px; animation-duration: 16s; }
-    .orb2 { width: 400px; height: 400px; background: var(--gold);   bottom: -100px; right: -80px; animation-duration: 12s; opacity: .15; }
-    .orb3 { width: 300px; height: 300px; background: var(--pink);   top: 40%; left: 60%; animation-duration: 10s; opacity: .2; }
-    @keyframes drift {
-      from { transform: translate(0,0) scale(1); }
-      to   { transform: translate(50px, 30px) scale(1.08); }
-    }
+    .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .3; animation: drift ease-in-out infinite alternate; }
+    .orb1 { width:600px; height:600px; background:var(--purple); top:-150px; left:-100px; animation-duration:16s; }
+    .orb2 { width:400px; height:400px; background:var(--gold);   bottom:-100px; right:-80px; animation-duration:12s; opacity:.15; }
+    .orb3 { width:300px; height:300px; background:var(--pink);   top:40%; left:60%; animation-duration:10s; opacity:.2; }
+    @keyframes drift { from { transform:translate(0,0) scale(1); } to { transform:translate(50px,30px) scale(1.08); } }
 
-    /* ── Linternas flotantes ── */
+    /* Linternas */
     .lanterns { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-    .lantern {
-      position: absolute;
-      border-radius: 50% 50% 45% 45%;
-      opacity: 0;
-      animation: rise linear infinite;
-    }
-    @keyframes rise {
-      0%   { transform: translateY(0) translateX(0); opacity: 0; }
-      8%   { opacity: .6; }
-      92%  { opacity: .3; }
-      100% { transform: translateY(-110vh) translateX(40px); opacity: 0; }
-    }
-    .ll1 { width:28px; height:36px; background:#F4C430; bottom:-40px; left:5%;   animation-duration:14s; animation-delay:0s; }
-    .ll2 { width:22px; height:28px; background:#E8A0B4; bottom:-40px; left:18%;  animation-duration:18s; animation-delay:3s; }
-    .ll3 { width:32px; height:42px; background:#F4C430; bottom:-40px; left:35%;  animation-duration:11s; animation-delay:6s; }
-    .ll4 { width:18px; height:24px; background:#B39DDB; bottom:-40px; left:52%;  animation-duration:16s; animation-delay:1s; }
-    .ll5 { width:26px; height:34px; background:#F4C430; bottom:-40px; left:68%;  animation-duration:13s; animation-delay:4s; }
-    .ll6 { width:20px; height:26px; background:#E8A0B4; bottom:-40px; left:82%;  animation-duration:19s; animation-delay:7s; }
-    .ll7 { width:24px; height:30px; background:#F4C430; bottom:-40px; left:92%;  animation-duration:10s; animation-delay:2s; }
-    .ll8 { width:16px; height:20px; background:#B39DDB; bottom:-40px; left:45%;  animation-duration:22s; animation-delay:9s; }
+    .lantern { position: absolute; border-radius: 50% 50% 45% 45%; opacity: 0; animation: rise linear infinite; }
+    @keyframes rise { 0% { transform:translateY(0); opacity:0; } 8% { opacity:.6; } 92% { opacity:.3; } 100% { transform:translateY(-110vh) translateX(40px); opacity:0; } }
+    .ll1 { width:28px; height:36px; background:#F4C430; bottom:-40px; left:5%;  animation-duration:14s; animation-delay:0s; }
+    .ll2 { width:22px; height:28px; background:#E8A0B4; bottom:-40px; left:18%; animation-duration:18s; animation-delay:3s; }
+    .ll3 { width:32px; height:42px; background:#F4C430; bottom:-40px; left:35%; animation-duration:11s; animation-delay:6s; }
+    .ll4 { width:18px; height:24px; background:#B39DDB; bottom:-40px; left:52%; animation-duration:16s; animation-delay:1s; }
+    .ll5 { width:26px; height:34px; background:#F4C430; bottom:-40px; left:68%; animation-duration:13s; animation-delay:4s; }
+    .ll6 { width:20px; height:26px; background:#E8A0B4; bottom:-40px; left:82%; animation-duration:19s; animation-delay:7s; }
+    .ll7 { width:24px; height:30px; background:#F4C430; bottom:-40px; left:92%; animation-duration:10s; animation-delay:2s; }
 
-    /* ── Foto ── */
-    #photoWrap {
-      position: fixed;
-      inset: 0;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #photoImg {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      opacity: 0;
-      transition: opacity .8s ease;
-      border-radius: 4px;
-      box-shadow: 0 0 80px rgba(0,0,0,.7);
-    }
+    /* Foto */
+    #photoWrap { position:fixed; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; }
+    #photoImg { max-width:100%; max-height:100%; object-fit:contain; opacity:0; transition:opacity .8s ease; box-shadow:0 0 80px rgba(0,0,0,.7); }
     #photoImg.visible { opacity: 1; }
-
-    /* ── Vignette sobre la foto ── */
-    #vignette {
-      position: fixed;
-      inset: 0;
-      z-index: 3;
-      background:
-        radial-gradient(ellipse at center, transparent 50%, rgba(28,15,63,.7) 100%);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity .8s;
-    }
+    #vignette { position:fixed; inset:0; z-index:3; background:radial-gradient(ellipse at center, transparent 50%, rgba(28,15,63,.7) 100%); pointer-events:none; opacity:0; transition:opacity .8s; }
     #vignette.visible { opacity: 1; }
 
-    /* ── Barra superior ── */
-    #topBar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 10;
-      padding: 24px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      background: linear-gradient(to bottom, rgba(28,15,63,.9), transparent);
-    }
-    .event-name {
-      font-family: 'Cinzel', serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--gold);
-      text-shadow: 0 0 20px rgba(244,196,48,.5);
-      letter-spacing: .08em;
-    }
-    .event-sub {
-      font-size: .75rem;
-      color: rgba(179,157,219,.7);
-      margin-top: 4px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      font-weight: 300;
-    }
-    #photoCount { text-align: right; }
-    #photoCount .label { font-size: .7rem; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .1em; }
-    #photoCount span {
-      display: block;
-      font-family: 'Cinzel', serif;
-      font-size: 2rem;
-      font-weight: 700;
-      color: rgba(255,255,255,.8);
-      line-height: 1;
-    }
+    /* Barra superior */
+    #topBar { position:fixed; top:0; left:0; right:0; z-index:10; padding:24px 40px; display:flex; justify-content:space-between; align-items:flex-start; background:linear-gradient(to bottom, rgba(28,15,63,.9), transparent); }
+    .event-name { font-family:'Cinzel',serif; font-size:1.5rem; font-weight:700; color:var(--gold); text-shadow:0 0 20px rgba(244,196,48,.5); letter-spacing:.08em; }
+    .event-sub { font-size:.75rem; color:rgba(179,157,219,.7); margin-top:4px; letter-spacing:.08em; text-transform:uppercase; font-weight:300; }
+    #photoCount { text-align:right; }
+    #photoCount .label { font-size:.7rem; color:rgba(255,255,255,.4); text-transform:uppercase; letter-spacing:.1em; }
+    #photoCount span { display:block; font-family:'Cinzel',serif; font-size:2rem; font-weight:700; color:rgba(255,255,255,.8); line-height:1; }
 
-    /* ── Barra inferior ── */
-    #bottomBar {
-      position: fixed;
+    /* Barra inferior */
+    #bottomBar { position:fixed; bottom:0; left:0; right:0; z-index:10; padding:40px; background:linear-gradient(to top, rgba(28,15,63,.85), transparent); display:flex; justify-content:space-between; align-items:flex-end; }
+    .qr-hint { display:flex; align-items:center; gap:14px; background:rgba(255,255,255,.07); backdrop-filter:blur(12px); border:1px solid rgba(244,196,48,.2); border-radius:16px; padding:14px 20px; }
+    .qr-icon { font-size:2rem; }
+    .qr-text { font-size:.8rem; line-height:1.5; color:rgba(255,255,255,.8); }
+    .qr-text strong { display:block; font-size:.95rem; color:var(--gold); }
+
+    /* Votos en pantalla */
+    #voteBar { display:flex; gap:16px; align-items:center; }
+    .vote-pill { background:rgba(255,255,255,.1); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.15); border-radius:99px; padding:8px 16px; font-size:1.1rem; display:flex; align-items:center; gap:6px; transition:transform .2s; }
+    .vote-pill .cnt { font-size:.85rem; font-weight:700; color:rgba(255,255,255,.9); }
+
+    /* Emojis flotantes */
+    .float-emoji { position:fixed; z-index:50; font-size:2.5rem; pointer-events:none; animation:floatUp 2s ease-out forwards; }
+    @keyframes floatUp { 0% { transform:translateY(0) scale(1); opacity:1; } 100% { transform:translateY(-200px) scale(1.4); opacity:0; } }
+
+    /* Timer */
+    #timerBar { position:fixed; bottom:0; left:0; right:0; height:3px; z-index:11; background:rgba(255,255,255,.08); }
+    #timerFill { height:100%; background:linear-gradient(90deg, var(--purple), var(--gold)); }
+
+    /* Badge */
+    #newBadge { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); background:linear-gradient(135deg,var(--purple),var(--gold2)); color:#fff; font-size:1rem; font-weight:700; padding:12px 30px; border-radius:99px; z-index:30; pointer-events:none; transition:transform .35s cubic-bezier(.175,.885,.32,1.275), opacity .3s; opacity:0; letter-spacing:.05em; }
+    #newBadge.show { transform:translate(-50%,-50%) scale(1); opacity:1; }
+
+    /* Idle */
+    #idle { position:fixed; inset:0; z-index:20; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; background:var(--bg); transition:opacity .8s; }
+    #idle.hidden { opacity:0; pointer-events:none; }
+    .idle-sun { font-size:80px; animation:float 4s ease-in-out infinite; filter:drop-shadow(0 0 30px rgba(244,196,48,.5)); }
+    @keyframes float { 0%,100% { transform:translateY(0) rotate(-3deg); } 50% { transform:translateY(-14px) rotate(3deg); } }
+    .idle-title { font-family:'Cinzel',serif; font-size:3rem; font-weight:700; color:var(--gold); text-shadow:0 0 40px rgba(244,196,48,.5); letter-spacing:.1em; text-align:center; }
+    .idle-flowers { font-size:1.5rem; letter-spacing:.3em; opacity:.7; }
+    .idle-sub { font-size:1rem; color:var(--lavender); text-align:center; font-weight:300; letter-spacing:.05em; }
+
+    /* ── RULETA ── */
+    #roulette { position:fixed; inset:0; z-index:100; background:rgba(28,15,63,.97); display:none; flex-direction:column; align-items:center; justify-content:center; gap:32px; }
+    #roulette.show { display:flex; }
+
+    .roulette-title { font-family:'Cinzel',serif; font-size:2.5rem; color:var(--gold); text-shadow:0 0 40px rgba(244,196,48,.6); letter-spacing:.1em; text-align:center; }
+
+    #rouletteFrame {
+      width: min(70vh, 70vw);
+      height: min(70vh, 70vw);
+      border-radius: 20px;
+      border: 3px solid rgba(244,196,48,.4);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 60px rgba(244,196,48,.2);
+    }
+    #rouletteImg { width:100%; height:100%; object-fit:cover; transition: none; }
+
+    .roulette-sub { font-size:1rem; color:var(--lavender); text-align:center; font-weight:300; }
+
+    #winnerBanner {
+      position: absolute;
       bottom: 0; left: 0; right: 0;
-      z-index: 10;
-      padding: 40px;
-      background: linear-gradient(to top, rgba(28,15,63,.85), transparent);
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
-
-    /* ── QR hint ── */
-    .qr-hint {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: rgba(255,255,255,.07);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(244,196,48,.2);
-      border-radius: 16px;
-      padding: 14px 20px;
-    }
-    .qr-icon { font-size: 2rem; }
-    .qr-text { font-size: .8rem; line-height: 1.5; color: rgba(255,255,255,.8); }
-    .qr-text strong { display: block; font-size: .95rem; color: var(--gold); }
-
-    /* ── Timer bar ── */
-    #timerBar {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 3px;
-      z-index: 11;
-      background: rgba(255,255,255,.08);
-    }
-    #timerFill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--purple), var(--gold));
-    }
-
-    /* ── Badge nueva foto ── */
-    #newBadge {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      background: linear-gradient(135deg, var(--purple), var(--gold2));
-      color: #fff;
-      font-family: 'Lato', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 12px 30px;
-      border-radius: 99px;
-      z-index: 30;
-      pointer-events: none;
-      transition: transform .35s cubic-bezier(.175,.885,.32,1.275), opacity .3s;
-      opacity: 0;
-      letter-spacing: .05em;
-    }
-    #newBadge.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-
-    /* ── Pantalla de espera ── */
-    #idle {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      background: var(--bg);
-      transition: opacity .8s;
-    }
-    #idle.hidden { opacity: 0; pointer-events: none; }
-
-    .idle-sun {
-      font-size: 80px;
-      animation: float 4s ease-in-out infinite;
-      filter: drop-shadow(0 0 30px rgba(244,196,48,.5));
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(-3deg); }
-      50%       { transform: translateY(-14px) rotate(3deg); }
-    }
-    .idle-title {
-      font-family: 'Cinzel', serif;
-      font-size: 3rem;
-      font-weight: 700;
-      color: var(--gold);
-      text-shadow: 0 0 40px rgba(244,196,48,.5);
-      letter-spacing: .1em;
+      background: linear-gradient(to top, rgba(28,15,63,.95), transparent);
+      padding: 24px;
       text-align: center;
+      display: none;
     }
-    .idle-flowers {
-      font-size: 1.5rem;
-      letter-spacing: .3em;
-      opacity: .7;
-    }
-    .idle-sub {
-      font-size: 1rem;
-      color: var(--lavender);
-      text-align: center;
-      font-weight: 300;
-      letter-spacing: .05em;
-    }
+    #winnerBanner.show { display: block; animation: fadeIn .6s; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .winner-label { font-family:'Cinzel',serif; font-size:1.8rem; color:var(--gold); text-shadow:0 0 30px rgba(244,196,48,.7); }
+    .winner-votes { font-size:1rem; color:var(--lavender); margin-top:6px; }
+
+    .roulette-hint { position:fixed; bottom:20px; right:24px; font-size:.7rem; color:rgba(255,255,255,.2); z-index:11; }
   </style>
 </head>
 <body>
 
 <div class="bg-orbs">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="orb orb3"></div>
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
 </div>
-
 <div class="lanterns">
-  <div class="lantern ll1"></div>
-  <div class="lantern ll2"></div>
-  <div class="lantern ll3"></div>
-  <div class="lantern ll4"></div>
-  <div class="lantern ll5"></div>
-  <div class="lantern ll6"></div>
+  <div class="lantern ll1"></div><div class="lantern ll2"></div><div class="lantern ll3"></div>
+  <div class="lantern ll4"></div><div class="lantern ll5"></div><div class="lantern ll6"></div>
   <div class="lantern ll7"></div>
-  <div class="lantern ll8"></div>
 </div>
 
-<!-- Espera -->
+<!-- Idle -->
 <div id="idle">
   <div class="idle-sun">✨</div>
   <div class="idle-title">XV de Lola</div>
@@ -272,12 +140,10 @@
 </div>
 
 <!-- Foto -->
-<div id="photoWrap">
-  <img id="photoImg" src="" alt="" />
-</div>
+<div id="photoWrap"><img id="photoImg" src="" alt="" /></div>
 <div id="vignette"></div>
 
-<!-- Overlay superior -->
+<!-- Top -->
 <div id="topBar">
   <div>
     <div class="event-name">✦ XV de Lola ✦</div>
@@ -289,26 +155,43 @@
   </div>
 </div>
 
-<!-- Overlay inferior -->
+<!-- Bottom -->
 <div id="bottomBar">
   <div class="qr-hint">
     <div class="qr-icon">📷</div>
     <div class="qr-text">
-      <strong>¡Sumate!</strong>
-      Escaneá el QR y enviá tu foto
+      <strong>¡Sumate!</strong>Escaneá el QR y enviá tu foto
     </div>
+  </div>
+  <div id="voteBar">
+    <div class="vote-pill">❤️ <span class="cnt" id="v-heart">0</span></div>
+    <div class="vote-pill">🔥 <span class="cnt" id="v-fire">0</span></div>
+    <div class="vote-pill">😂 <span class="cnt" id="v-laugh">0</span></div>
+    <div class="vote-pill">😮 <span class="cnt" id="v-wow">0</span></div>
   </div>
 </div>
 
-<!-- Timer -->
 <div id="timerBar"><div id="timerFill" style="width:100%"></div></div>
-
-<!-- Badge -->
 <div id="newBadge">🏮 Nueva foto</div>
 
+<!-- Ruleta -->
+<div id="roulette">
+  <div class="roulette-title">✨ Foto Ganadora ✨</div>
+  <div id="rouletteFrame">
+    <img id="rouletteImg" src="" alt="" />
+    <div id="winnerBanner">
+      <div class="winner-label" id="winnerLabel">🏆 ¡La más votada!</div>
+      <div class="winner-votes" id="winnerVotes"></div>
+    </div>
+  </div>
+  <div class="roulette-sub" id="rouletteSub">Girando...</div>
+</div>
+
+<div class="roulette-hint">R = Ruleta · F = Fullscreen · ESC = Cerrar</div>
+
 <script>
-  const API_BASE   = window.location.origin;
-  const WS_URL     = API_BASE.replace(/^http/, 'ws') + '/ws/screen';
+  const API_BASE  = window.location.origin;
+  const WS_URL    = API_BASE.replace(/^http/, 'ws') + '/ws/screen';
   const DISPLAY_MS = 8000;
   const POLL_MS    = 5000;
 
@@ -317,19 +200,25 @@
   let totalCount = 0;
   let wsReady    = false;
   let timerTO    = null;
+  let currentPhoto = null;
+  let ws         = null;
   const knownIds = new Set();
 
+  // Contadores de votos de la foto actual
+  const voteCounts = { '❤️': 0, '🔥': 0, '😂': 0, '😮': 0 };
+
   function connectWS() {
-    const ws = new WebSocket(WS_URL);
+    ws = new WebSocket(WS_URL);
     ws.onopen  = () => { wsReady = true; };
     ws.onmessage = e => {
       const msg = JSON.parse(e.data);
-      if (msg.type === 'init')      msg.photos.forEach(p => enqueue(p));
+      if (msg.type === 'init')           msg.photos.forEach(p => enqueue(p));
       else if (msg.type === 'new_photo') { enqueue(msg.photo); flashBadge(); }
+      else if (msg.type === 'vote')      handleVote(msg);
     };
     ws.onclose = () => { wsReady = false; setTimeout(connectWS, 3000); };
     ws.onerror = () => ws.close();
-    setInterval(() => { if (ws.readyState === 1) ws.send('ping'); }, 20000);
+    setInterval(() => { if (ws && ws.readyState === 1) ws.send('ping'); }, 20000);
   }
 
   async function pollQueue() {
@@ -358,12 +247,15 @@
   function displayPhoto(photo) {
     const img      = document.getElementById('photoImg');
     const vignette = document.getElementById('vignette');
-    const idle     = document.getElementById('idle');
     const fill     = document.getElementById('timerFill');
 
-    idle.classList.add('hidden');
+    document.getElementById('idle').classList.add('hidden');
     img.classList.remove('visible');
     vignette.classList.remove('visible');
+
+    // Resetear contadores de votos
+    Object.keys(voteCounts).forEach(k => voteCounts[k] = 0);
+    updateVoteDisplay();
 
     const tmp = new Image();
     tmp.onload = () => {
@@ -376,6 +268,12 @@
     tmp.onerror = () => setTimeout(showNext, 800);
     tmp.src = API_BASE + photo.url;
 
+    // Avisar al backend qué foto se está mostrando
+    currentPhoto = photo;
+    if (ws && ws.readyState === 1) {
+      ws.send(JSON.stringify({ type: 'now_showing', photo }));
+    }
+
     if (timerTO) clearTimeout(timerTO);
     fill.style.transition = 'none';
     fill.style.width = '100%';
@@ -386,6 +284,103 @@
     timerTO = setTimeout(showNext, DISPLAY_MS);
   }
 
+  // ── Votos ────────────────────────────────────────────────────────────────
+  function handleVote(msg) {
+    if (!currentPhoto || msg.photo_id !== currentPhoto.id) return;
+    const counts = msg.counts || {};
+    Object.keys(counts).forEach(k => { voteCounts[k] = counts[k]; });
+    updateVoteDisplay();
+    spawnFloatingEmoji(msg.emoji);
+  }
+
+  function updateVoteDisplay() {
+    document.getElementById('v-heart').textContent = voteCounts['❤️'] || 0;
+    document.getElementById('v-fire').textContent  = voteCounts['🔥'] || 0;
+    document.getElementById('v-laugh').textContent = voteCounts['😂'] || 0;
+    document.getElementById('v-wow').textContent   = voteCounts['😮'] || 0;
+  }
+
+  function spawnFloatingEmoji(emoji) {
+    const el = document.createElement('div');
+    el.className = 'float-emoji';
+    el.textContent = emoji;
+    el.style.left  = (20 + Math.random() * 60) + 'vw';
+    el.style.bottom = '120px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2100);
+  }
+
+  // ── Ruleta ───────────────────────────────────────────────────────────────
+  async function startRoulette() {
+    const overlay = document.getElementById('roulette');
+    overlay.classList.add('show');
+    document.getElementById('winnerBanner').classList.remove('show');
+    document.getElementById('rouletteSub').textContent = 'Cargando fotos...';
+
+    let photos = [];
+    try {
+      const data = await fetch(`${API_BASE}/votes`).then(r => r.json());
+      photos = data.photos.filter(p => p.total_votes > 0);
+      if (!photos.length) {
+        // Si no hay votos, usar todas las fotos
+        const q = await fetch(`${API_BASE}/queue`).then(r => r.json());
+        photos = q.photos;
+      }
+    } catch (_) {}
+
+    if (!photos.length) {
+      document.getElementById('rouletteSub').textContent = 'No hay fotos para mostrar';
+      return;
+    }
+
+    // Girar: cambiar foto rápido por 4 segundos, luego frenar
+    const img    = document.getElementById('rouletteImg');
+    const winner = photos[0]; // la más votada
+    let   idx    = 0;
+    const allUrls = photos.map(p => API_BASE + p.url);
+    let   interval = 80;
+    let   elapsed  = 0;
+    document.getElementById('rouletteSub').textContent = '✨ Girando...';
+
+    const spin = setInterval(() => {
+      img.src = allUrls[idx % allUrls.length];
+      idx++;
+      elapsed += interval;
+
+      // Frenar progresivamente
+      if (elapsed > 3000) interval = 300;
+      else if (elapsed > 2000) interval = 180;
+      else if (elapsed > 1200) interval = 120;
+
+      if (elapsed > 4500) {
+        clearInterval(spin);
+        // Mostrar ganadora
+        img.src = API_BASE + winner.url;
+        document.getElementById('rouletteSub').textContent = '';
+        const total = winner.total_votes;
+        const topEmoji = Object.entries(winner.votes || {}).sort((a,b) => b[1]-a[1])[0];
+        document.getElementById('winnerVotes').textContent =
+          `${total} voto${total !== 1 ? 's' : ''} · ${topEmoji ? topEmoji[0].repeat(Math.min(topEmoji[1], 5)) : ''}`;
+        document.getElementById('winnerBanner').classList.add('show');
+      }
+    }, interval);
+  }
+
+  function closeRoulette() {
+    document.getElementById('roulette').classList.remove('show');
+  }
+
+  // ── Teclado ──────────────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'r' || e.key === 'R') startRoulette();
+    if (e.key === 'Escape')             closeRoulette();
+    if (e.key === 'f' || e.key === 'F') document.documentElement.requestFullscreen?.().catch(() => {});
+  });
+
+  document.addEventListener('click', () => {
+    document.documentElement.requestFullscreen?.().catch(() => {});
+  });
+
   function flashBadge() {
     const b = document.getElementById('newBadge');
     b.classList.add('show');
@@ -393,10 +388,6 @@
   }
 
   connectWS();
-
-  document.addEventListener('click', () => {
-    document.documentElement.requestFullscreen?.().catch(() => {});
-  });
 </script>
 </body>
 </html>
