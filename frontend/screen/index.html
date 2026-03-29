@@ -285,7 +285,8 @@
       const msg = JSON.parse(e.data);
       if (msg.type === 'init')           msg.photos.forEach(p => enqueue(p));
       else if (msg.type === 'new_photo') { enqueue(msg.photo); flashBadge(); }
-      else if (msg.type === 'vote')      handleVote(msg);
+      else if (msg.type === 'vote')         handleVote(msg);
+      else if (msg.type === 'start_roulette') startRoulette();
     };
     ws.onclose = () => { wsReady = false; setTimeout(connectWS, 3000); };
     ws.onerror = () => ws.close();

@@ -201,6 +201,13 @@ async def get_current_photo():
 
 # ─── Misc ────────────────────────────────────────────────────────────────────
 
+@app.post("/roulette/start")
+async def start_roulette():
+    """El admin dispara la ruleta desde su celular."""
+    await screen_mgr.broadcast({"type": "start_roulette"})
+    return JSONResponse({"ok": True})
+
+
 @app.get("/queue")
 async def get_queue():
     return {"photos": photo_queue}

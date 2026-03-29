@@ -426,6 +426,32 @@
     document.getElementById('uploadError').style.display = 'none';
     showScreen('s-home');
   }
+
+  // ── Admin ────────────────────────────────────────────────────────────────
+  if (new URLSearchParams(location.search).get('admin') === '1') {
+    const btn = document.createElement('button');
+    btn.textContent = '🎰 Iniciar Ruleta';
+    btn.style.cssText = `
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      z-index: 999; background: linear-gradient(135deg, #F4C430, #E8A020);
+      color: #1C0F3F; font-family: 'Cinzel', serif; font-weight: 700;
+      font-size: 1rem; padding: 14px 32px; border: none; border-radius: 50px;
+      box-shadow: 0 4px 20px rgba(244,196,48,.5); cursor: pointer;
+      letter-spacing: .05em;
+    `;
+    btn.onclick = async () => {
+      btn.disabled = true;
+      btn.textContent = '✨ Iniciando...';
+      try {
+        await fetch(`${API_BASE}/roulette/start`, { method: 'POST' });
+        btn.textContent = '✅ ¡Listo!';
+      } catch (_) {
+        btn.textContent = '❌ Error';
+      }
+      setTimeout(() => { btn.disabled = false; btn.textContent = '🎰 Iniciar Ruleta'; }, 3000);
+    };
+    document.body.appendChild(btn);
+  }
 </script>
 </body>
 </html>
