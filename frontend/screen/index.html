@@ -192,6 +192,77 @@
 <script>
   const API_BASE  = window.location.origin;
   const WS_URL    = API_BASE.replace(/^http/, 'ws') + '/ws/screen';
+
+  // ── Audio ─────────────────────────────────────────────────────────────────
+  const AC = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playTone(freqs, dur, type = 'sine', vol = 0.18) {
+    freqs.forEach(({ f, t = 0, d = dur }) => {
+      const o = AC.createOscillator();
+      const g = AC.createGain();
+      o.connect(g); g.connect(AC.destination);
+      o.type = type;
+      o.frequency.setValueAtTime(f, AC.currentTime + t);
+      g.gain.setValueAtTime(0, AC.currentTime + t);
+      g.gain.linearRampToValueAtTime(vol, AC.currentTime + t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + t + d);
+      o.start(AC.currentTime + t);
+      o.stop(AC.currentTime + t + d + 0.05);
+    });
+  }
+
+  function playNoise(dur = 0.12, vol = 0.08) {
+    const buf = AC.createBuffer(1, AC.sampleRate * dur, AC.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    const src = AC.createBufferSource();
+    const g   = AC.createGain();
+    const flt = AC.createBiquadFilter();
+    flt.type = 'bandpass'; flt.frequency.value = 1200; flt.Q.value = 0.8;
+    src.buffer = buf;
+    src.connect(flt); flt.connect(g); g.connect(AC.destination);
+    g.gain.setValueAtTime(vol, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + dur);
+    src.start(); src.stop(AC.currentTime + dur + 0.05);
+  }
+
+  const EMOJI_SOUNDS = {
+    '❤️': () => playTone([{ f:523 }, { f:659, t:.08 }, { f:784, t:.16 }], .22, 'sine', .14),
+    '🔥': () => { playNoise(.18, .12); playTone([{ f:180, t:.02 }], .18, 'sawtooth', .07); },
+    '😂': () => playTone([
+      { f:600,t:0,d:.07 },{ f:700,t:.08,d:.07 },{ f:600,t:.16,d:.07 },
+      { f:700,t:.24,d:.07 },{ f:800,t:.32,d:.09 }
+    ], .09, 'sine', .13),
+    '😮': () => playTone([{ f:880, t:0 }, { f:660, t:.15 }], .28, 'sine', .13),
+  };
+
+  function playEmojiSound(emoji) {
+    if (AC.state === 'suspended') AC.resume();
+    EMOJI_SOUNDS[emoji]?.();
+  }
+
+  let rouletteTickInterval = null;
+  function playRouletteTick(fast = true) {
+    if (AC.state === 'suspended') AC.resume();
+    playTone([{ f: fast ? 1200 : 800 }], fast ? 0.04 : 0.07, 'square', 0.08);
+  }
+
+  function playRouletteWin() {
+    if (AC.state === 'suspended') AC.resume();
+    // Fanfarria: Do Mi Sol Do (ascendente)
+    playTone([
+      { f:523, t:0,   d:.18 },
+      { f:659, t:.18, d:.18 },
+      { f:784, t:.36, d:.18 },
+      { f:1047,t:.54, d:.5  },
+    ], .18, 'sine', .2);
+    // Acorde de fondo
+    playTone([
+      { f:262, t:.54, d:.5 },
+      { f:330, t:.54, d:.5 },
+      { f:392, t:.54, d:.5 },
+    ], .5, 'triangle', .08);
+  }
   const DISPLAY_MS = 8000;
   const POLL_MS    = 5000;
 
@@ -291,6 +362,7 @@
     Object.keys(counts).forEach(k => { voteCounts[k] = counts[k]; });
     updateVoteDisplay();
     spawnFloatingEmoji(msg.emoji);
+    playEmojiSound(msg.emoji);
   }
 
   function updateVoteDisplay() {
@@ -347,6 +419,9 @@
       idx++;
       elapsed += interval;
 
+      // Tick con tono más lento al frenar
+      playRouletteTick(elapsed < 3000);
+
       // Frenar progresivamente
       if (elapsed > 3000) interval = 300;
       else if (elapsed > 2000) interval = 180;
@@ -359,6 +434,7 @@
         document.getElementById('rouletteSub').textContent = '';
         document.getElementById('winnerVotes').textContent = '';
         document.getElementById('winnerBanner').classList.add('show');
+        playRouletteWin();
       }
     }, interval);
   }
