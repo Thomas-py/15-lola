@@ -180,7 +180,7 @@
   <div id="rouletteFrame">
     <img id="rouletteImg" src="" alt="" />
     <div id="winnerBanner">
-      <div class="winner-label" id="winnerLabel">🏆 ¡La más votada!</div>
+      <div class="winner-label" id="winnerLabel">🏆 ¡La elegida!</div>
       <div class="winner-votes" id="winnerVotes"></div>
     </div>
   </div>
@@ -335,7 +335,7 @@
 
     // Girar: cambiar foto rápido por 4 segundos, luego frenar
     const img    = document.getElementById('rouletteImg');
-    const winner = photos[0]; // la más votada
+    const winner = photos[Math.floor(Math.random() * photos.length)]; // al azar
     let   idx    = 0;
     const allUrls = photos.map(p => API_BASE + p.url);
     let   interval = 80;
@@ -357,10 +357,7 @@
         // Mostrar ganadora
         img.src = API_BASE + winner.url;
         document.getElementById('rouletteSub').textContent = '';
-        const total = winner.total_votes;
-        const topEmoji = Object.entries(winner.votes || {}).sort((a,b) => b[1]-a[1])[0];
-        document.getElementById('winnerVotes').textContent =
-          `${total} voto${total !== 1 ? 's' : ''} · ${topEmoji ? topEmoji[0].repeat(Math.min(topEmoji[1], 5)) : ''}`;
+        document.getElementById('winnerVotes').textContent = '';
         document.getElementById('winnerBanner').classList.add('show');
       }
     }, interval);
