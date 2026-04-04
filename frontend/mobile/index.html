@@ -173,9 +173,15 @@
     }
 
     .footer { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: .7rem; color: rgba(179,157,219,.3); letter-spacing: .05em; z-index: 1; }
+
+    /* ── Banner sin conexión ── */
+    #offlineBanner { position: fixed; top: 0; left: 0; right: 0; z-index: 500; background: rgba(180,40,40,.9); color: #fff; text-align: center; font-size: .8rem; padding: 10px; display: none; backdrop-filter: blur(4px); }
+    #offlineBanner.show { display: block; }
   </style>
 </head>
 <body>
+
+<div id="offlineBanner">⚠️ Sin conexión — reconectando...</div>
 
 <div class="lanterns">
   <div class="lantern l1"></div><div class="lantern l2"></div>
@@ -269,13 +275,18 @@
   function connectMobileWS() {
     const ws = new WebSocket(WS_URL);
 
+    ws.onopen = () => {
+      document.getElementById('offlineBanner').classList.remove('show');
+    };
     ws.onmessage = e => {
       const msg = JSON.parse(e.data);
-      if (msg.type === 'now_showing')  showVoteOverlay(msg.photo);
+      if (msg.type === 'now_showing')       showVoteOverlay(msg.photo);
       else if (msg.type === 'photo_skipped') closeVote();
     };
-
-    ws.onclose = () => setTimeout(connectMobileWS, 3000);
+    ws.onclose = () => {
+      document.getElementById('offlineBanner').classList.add('show');
+      setTimeout(connectMobileWS, 3000);
+    };
     ws.onerror = () => ws.close();
     setInterval(() => { if (ws.readyState === 1) ws.send('ping'); }, 20000);
   }
@@ -427,7 +438,7 @@
   }
 
   // ── Admin ────────────────────────────────────────────────────────────────
-  if (new URLSearchParams(location.search).get('admin') === '1') {
+  if (new URLSearchParams(location.search).get('xvlola') === 'admin2026') {
     const btn = document.createElement('button');
     btn.textContent = '🎰 Iniciar Ruleta';
     btn.style.cssText = `
@@ -461,6 +472,17 @@
       border-radius: 50px; cursor: pointer; letter-spacing: .04em;
       box-shadow: 0 2px 12px rgba(0,0,0,.3);
     `;
+    // Deshabilitar saltar si no hay foto en pantalla
+    async function refreshSkipState() {
+      try {
+        const data = await fetch(`${API_BASE}/current-photo`).then(r => r.json());
+        skipBtn.disabled = !data.photo;
+        skipBtn.style.opacity = data.photo ? '1' : '0.4';
+      } catch (_) {}
+    }
+    refreshSkipState();
+    setInterval(refreshSkipState, 4000);
+
     skipBtn.onclick = async () => {
       skipBtn.disabled = true;
       skipBtn.textContent = '⏳ Saltando...';
@@ -470,7 +492,7 @@
       } catch (_) {
         skipBtn.textContent = '❌ Error';
       }
-      setTimeout(() => { skipBtn.disabled = false; skipBtn.textContent = '⏭️ Saltar foto'; }, 2000);
+      setTimeout(() => { skipBtn.textContent = '⏭️ Saltar foto'; refreshSkipState(); }, 2000);
     };
     document.body.appendChild(skipBtn);
   }

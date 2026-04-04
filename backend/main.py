@@ -2,12 +2,14 @@ import asyncio
 import json
 import logging
 import os
+import time
 import uuid
+from collections import defaultdict
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import BackgroundTasks, FastAPI, File, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import BackgroundTasks, FastAPI, File, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -19,9 +21,15 @@ logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).parent
 UPLOADS_DIR = BASE_DIR / "uploads"
 UPLOADS_DIR.mkdir(exist_ok=True)
+VOTES_FILE = UPLOADS_DIR / "votes.json"
 
 MAX_IMAGE_SIZE = 10 * 1024 * 1024
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"}
+
+# Rate limiting: máx 5 fotos por IP por minuto
+RATE_LIMIT_MAX  = 5
+RATE_LIMIT_SECS = 60
+upload_timestamps: dict[str, list[float]] = defaultdict(list)
 
 
 # ─── Managers WebSocket ──────────────────────────────────────────────────────
@@ -77,6 +85,29 @@ current_photo: dict | None = None
 # votos: { photo_id: { "❤️": 3, "🔥": 1, ... } }
 votes: dict[str, dict[str, int]] = {}
 
+# deduplicación server-side: { photo_id: set(ip) }
+votes_by_ip: dict[str, set[str]] = defaultdict(set)
+
+
+# ─── Persistencia de votos ───────────────────────────────────────────────────
+
+def load_votes():
+    """Carga votos desde disco al iniciar."""
+    global votes
+    if VOTES_FILE.exists():
+        try:
+            votes = json.loads(VOTES_FILE.read_text())
+            logger.info(f"Votos cargados desde disco: {len(votes)} fotos")
+        except Exception as e:
+            logger.error(f"Error cargando votos: {e}")
+
+def save_votes():
+    """Persiste votos en disco (sin bloquear el event loop)."""
+    try:
+        VOTES_FILE.write_text(json.dumps(votes))
+    except Exception as e:
+        logger.error(f"Error guardando votos: {e}")
+
 
 # ─── Drive ───────────────────────────────────────────────────────────────────
 
@@ -94,6 +125,7 @@ async def upload_to_drive_bg(file_path: Path, filename: str):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    load_votes()
     logger.info("QR-15 backend iniciado")
     yield
 
@@ -115,7 +147,16 @@ app.mount("/screen", StaticFiles(directory=str(FRONTEND_DIR / "screen"), html=Tr
 # ─── Upload ──────────────────────────────────────────────────────────────────
 
 @app.post("/upload")
-async def upload_photo(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+async def upload_photo(request: Request, background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+    # Rate limiting por IP
+    ip = request.client.host if request.client else "unknown"
+    now = time.monotonic()
+    timestamps = upload_timestamps[ip]
+    upload_timestamps[ip] = [t for t in timestamps if now - t < RATE_LIMIT_SECS]
+    if len(upload_timestamps[ip]) >= RATE_LIMIT_MAX:
+        raise HTTPException(429, "Demasiadas fotos seguidas. Esperá un momento.")
+    upload_timestamps[ip].append(now)
+
     content_type = file.content_type or ""
     if content_type not in ALLOWED_TYPES and not content_type.startswith("image/"):
         raise HTTPException(400, "Solo se permiten imágenes.")
@@ -129,7 +170,7 @@ async def upload_photo(background_tasks: BackgroundTasks, file: UploadFile = Fil
     filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.{ext}"
     file_path = UPLOADS_DIR / filename
     file_path.write_bytes(content)
-    logger.info(f"Foto guardada: {filename} ({len(content) // 1024} KB)")
+    logger.info(f"Foto guardada: {filename} ({len(content) // 1024} KB) — IP: {ip}")
 
     photo = {
         "id": uuid.uuid4().hex,
@@ -156,18 +197,29 @@ class VoteRequest(BaseModel):
 VALID_EMOJIS = {"❤️", "🔥", "😂", "😮"}
 
 @app.post("/vote")
-async def cast_vote(body: VoteRequest):
+async def cast_vote(request: Request, body: VoteRequest):
     if body.emoji not in VALID_EMOJIS:
         raise HTTPException(400, "Emoji no válido.")
+
+    # Solo se puede votar la foto que está en pantalla ahora mismo
+    if not current_photo or body.photo_id != current_photo["id"]:
+        raise HTTPException(400, "Esa foto ya no está en pantalla.")
+
+    # Deduplicación server-side por IP
+    ip = request.client.host if request.client else "unknown"
+    if ip in votes_by_ip[body.photo_id]:
+        raise HTTPException(400, "Ya votaste esta foto.")
+    votes_by_ip[body.photo_id].add(ip)
 
     if body.photo_id not in votes:
         votes[body.photo_id] = {}
     votes[body.photo_id][body.emoji] = votes[body.photo_id].get(body.emoji, 0) + 1
 
     total = sum(votes[body.photo_id].values())
-    logger.info(f"Voto — {body.photo_id[:8]} {body.emoji} (total: {total})")
+    logger.info(f"Voto — {body.photo_id[:8]} {body.emoji} (total: {total}) — IP: {ip}")
 
-    # Notificar a las pantallas para animar el emoji
+    save_votes()
+
     await screen_mgr.broadcast({
         "type": "vote",
         "photo_id": body.photo_id,
@@ -217,6 +269,8 @@ async def skip_photo():
         async with queue_lock:
             photo_queue[:] = [p for p in photo_queue if p["id"] != pid]
         votes.pop(pid, None)
+        votes_by_ip.pop(pid, None)
+        save_votes()
         current_photo = None
     await screen_mgr.broadcast({"type": "skip_photo"})
     await mobile_mgr.broadcast({"type": "photo_skipped"})
@@ -250,10 +304,8 @@ async def ws_screen(ws: WebSocket):
             try:
                 msg = json.loads(raw)
                 if msg.get("type") == "now_showing":
-                    # La pantalla avisa qué foto está mostrando
                     photo = msg.get("photo")
                     current_photo = photo
-                    # Avisar a todos los móviles
                     await mobile_mgr.broadcast({"type": "now_showing", "photo": photo})
                     logger.info(f"Mostrando: {photo['id'][:8] if photo else 'ninguna'}")
             except (json.JSONDecodeError, KeyError):
@@ -268,7 +320,6 @@ async def ws_screen(ws: WebSocket):
 async def ws_mobile(ws: WebSocket):
     await mobile_mgr.connect(ws)
     try:
-        # Enviar foto actual si ya hay una en pantalla
         if current_photo:
             pid = current_photo["id"]
             await mobile_mgr.send(ws, {

@@ -118,6 +118,12 @@
     .winner-votes { font-size:1rem; color:var(--lavender); margin-top:6px; }
 
     .roulette-hint { position:fixed; bottom:20px; right:24px; font-size:.7rem; color:rgba(255,255,255,.2); z-index:11; }
+
+    /* ── Indicador WS ── */
+    #wsIndicator { position:fixed; top:12px; right:16px; z-index:200; display:flex; align-items:center; gap:6px; font-size:.65rem; color:rgba(255,255,255,.4); opacity:0; transition:opacity .4s; }
+    #wsIndicator.show { opacity:1; }
+    #wsDot { width:7px; height:7px; border-radius:50%; background:#ff5555; animation:blink 1s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
   </style>
 </head>
 <body>
@@ -187,7 +193,8 @@
   <div class="roulette-sub" id="rouletteSub">Girando...</div>
 </div>
 
-<div class="roulette-hint">R = Ruleta · F = Fullscreen · ESC = Cerrar</div>
+<div id="wsIndicator"><div id="wsDot"></div> Reconectando...</div>
+<div class="roulette-hint">F = Fullscreen · ESC = Cerrar ruleta</div>
 
 <script>
   const API_BASE  = window.location.origin;
@@ -268,12 +275,13 @@
 
   const queue    = [];
   const history  = [];   // fotos ya mostradas
-  let showing    = false;
-  let totalCount = 0;
-  let wsReady    = false;
-  let timerTO    = null;
+  let showing      = false;
+  let totalCount   = 0;
+  let wsReady      = false;
+  let timerTO      = null;
   let currentPhoto = null;
-  let ws         = null;
+  let ws           = null;
+  let rouletteRunning = false;  // evita doble disparo
   const knownIds = new Set();
 
   // Contadores de votos de la foto actual
@@ -281,7 +289,10 @@
 
   function connectWS() {
     ws = new WebSocket(WS_URL);
-    ws.onopen  = () => { wsReady = true; };
+    ws.onopen  = () => {
+      wsReady = true;
+      document.getElementById('wsIndicator').classList.remove('show');
+    };
     ws.onmessage = e => {
       const msg = JSON.parse(e.data);
       if (msg.type === 'init')           msg.photos.forEach(p => enqueue(p));
@@ -290,7 +301,11 @@
       else if (msg.type === 'start_roulette') startRoulette();
       else if (msg.type === 'skip_photo')    skipPhoto();
     };
-    ws.onclose = () => { wsReady = false; setTimeout(connectWS, 3000); };
+    ws.onclose = () => {
+      wsReady = false;
+      document.getElementById('wsIndicator').classList.add('show');
+      setTimeout(connectWS, 3000);
+    };
     ws.onerror = () => ws.close();
     setInterval(() => { if (ws && ws.readyState === 1) ws.send('ping'); }, 20000);
   }
@@ -354,6 +369,8 @@
 
     const tmp = new Image();
     tmp.onload = () => {
+      // Liberar referencia anterior para ayudar al GC del navegador
+      img.src = '';
       img.src = API_BASE + photo.url;
       requestAnimationFrame(() => requestAnimationFrame(() => {
         img.classList.add('visible');
@@ -413,6 +430,8 @@
 
   // ── Ruleta ───────────────────────────────────────────────────────────────
   async function startRoulette() {
+    if (rouletteRunning) return;
+    rouletteRunning = true;
     const overlay = document.getElementById('roulette');
     overlay.classList.add('show');
     document.getElementById('winnerBanner').classList.remove('show');
@@ -431,7 +450,7 @@
 
     if (!photos.length) {
       document.getElementById('rouletteSub').textContent = 'Todavía no hay fotos 📷';
-      setTimeout(closeRoulette, 2500);
+      setTimeout(() => { closeRoulette(); rouletteRunning = false; }, 2500);
       return;
     }
 
@@ -471,6 +490,7 @@
 
   function closeRoulette() {
     document.getElementById('roulette').classList.remove('show');
+    rouletteRunning = false;
   }
 
   // ── Teclado ──────────────────────────────────────────────────────────────
