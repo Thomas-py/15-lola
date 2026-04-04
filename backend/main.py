@@ -210,7 +210,14 @@ async def start_roulette():
 
 @app.post("/photo/skip")
 async def skip_photo():
-    """El admin saca la foto actual de pantalla."""
+    """El admin saca la foto actual de pantalla y la elimina de la ruleta."""
+    global current_photo
+    if current_photo:
+        pid = current_photo["id"]
+        async with queue_lock:
+            photo_queue[:] = [p for p in photo_queue if p["id"] != pid]
+        votes.pop(pid, None)
+        current_photo = None
     await screen_mgr.broadcast({"type": "skip_photo"})
     await mobile_mgr.broadcast({"type": "photo_skipped"})
     return JSONResponse({"ok": True})
