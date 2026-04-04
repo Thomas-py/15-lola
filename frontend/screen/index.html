@@ -237,58 +237,6 @@
       line-height: 1;
     }
 
-    /* ── BOTTOM: VOTOS ── */
-    #bottomBar {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
-      padding: 60px 44px 20px;
-      background: linear-gradient(to top, rgba(14,8,32,.8) 0%, transparent 100%);
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-    }
-    #voteBar {
-      display: flex; gap: 20px; align-items: center;
-    }
-    .vote-pill {
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-      background: rgba(255,255,255,.07);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 20px;
-      padding: 12px 22px;
-      min-width: 70px;
-      transition: transform .2s, background .3s, border-color .3s, box-shadow .3s;
-    }
-    .vote-pill.pulse {
-      animation: votePulse .45s ease-out;
-    }
-    @keyframes votePulse {
-      0%   { transform: scale(1); }
-      40%  { transform: scale(1.18); }
-      100% { transform: scale(1); }
-    }
-    .vote-emoji { font-size: 1.8rem; line-height: 1; }
-    .vote-cnt {
-      font-family: 'Cinzel', serif;
-      font-size: .9rem;
-      font-weight: 700;
-      color: rgba(255,255,255,.85);
-      min-width: 1ch;
-      text-align: center;
-    }
-
-    /* ── Emojis flotantes ── */
-    .float-emoji {
-      position: fixed; z-index: 50;
-      font-size: 3rem;
-      pointer-events: none;
-      animation: floatUp 2.4s ease-out forwards;
-    }
-    @keyframes floatUp {
-      0%   { transform: translateY(0)    scale(1);   opacity: 1; }
-      30%  { transform: translateY(-80px) scale(1.2); opacity: 1; }
-      100% { transform: translateY(-260px) scale(.8); opacity: 0; }
-    }
 
     /* ── Timer ── */
     #timerBar {
@@ -498,27 +446,6 @@
   </div>
 </div>
 
-<!-- Bottom bar: votos -->
-<div id="bottomBar">
-  <div id="voteBar">
-    <div class="vote-pill" id="pill-heart">
-      <div class="vote-emoji">❤️</div>
-      <div class="vote-cnt" id="v-heart">0</div>
-    </div>
-    <div class="vote-pill" id="pill-fire">
-      <div class="vote-emoji">🔥</div>
-      <div class="vote-cnt" id="v-fire">0</div>
-    </div>
-    <div class="vote-pill" id="pill-laugh">
-      <div class="vote-emoji">😂</div>
-      <div class="vote-cnt" id="v-laugh">0</div>
-    </div>
-    <div class="vote-pill" id="pill-wow">
-      <div class="vote-emoji">😮</div>
-      <div class="vote-cnt" id="v-wow">0</div>
-    </div>
-  </div>
-</div>
 
 <div id="timerBar"><div id="timerFill" style="width:100%"></div></div>
 <div id="newBadge">🏮 &nbsp;Nueva foto</div>
@@ -595,36 +522,6 @@
     });
   }
 
-  function playNoise(dur = 0.12, vol = 0.08) {
-    const buf  = AC.createBuffer(1, AC.sampleRate * dur, AC.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-    const src = AC.createBufferSource();
-    const g   = AC.createGain();
-    const flt = AC.createBiquadFilter();
-    flt.type = 'bandpass'; flt.frequency.value = 1200; flt.Q.value = 0.8;
-    src.buffer = buf;
-    src.connect(flt); flt.connect(g); g.connect(AC.destination);
-    g.gain.setValueAtTime(vol, AC.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + dur);
-    src.start(); src.stop(AC.currentTime + dur + 0.05);
-  }
-
-  const EMOJI_SOUNDS = {
-    '❤️': () => playTone([{ f:523 }, { f:659, t:.08 }, { f:784, t:.16 }], .22, 'sine', .14),
-    '🔥': () => { playNoise(.18, .12); playTone([{ f:180, t:.02 }], .18, 'sawtooth', .07); },
-    '😂': () => playTone([
-      { f:600,t:0,d:.07 },{ f:700,t:.08,d:.07 },{ f:600,t:.16,d:.07 },
-      { f:700,t:.24,d:.07 },{ f:800,t:.32,d:.09 }
-    ], .09, 'sine', .13),
-    '😮': () => playTone([{ f:880, t:0 }, { f:660, t:.15 }], .28, 'sine', .13),
-  };
-
-  function playEmojiSound(emoji) {
-    if (AC.state === 'suspended') AC.resume();
-    EMOJI_SOUNDS[emoji]?.();
-  }
-
   function playRouletteTick(fast = true) {
     if (AC.state === 'suspended') AC.resume();
     playTone([{ f: fast ? 1200 : 800 }], fast ? 0.04 : 0.07, 'square', 0.08);
@@ -660,9 +557,6 @@
   let rouletteRunning = false;
   const knownIds = new Set();
 
-  const voteCounts = { '❤️': 0, '🔥': 0, '😂': 0, '😮': 0 };
-  const PILL_IDS   = { '❤️': 'pill-heart', '🔥': 'pill-fire', '😂': 'pill-laugh', '😮': 'pill-wow' };
-
   // ── WebSocket ────────────────────────────────────────────────────────────
   function connectWS() {
     ws = new WebSocket(WS_URL);
@@ -674,7 +568,6 @@
       const msg = JSON.parse(e.data);
       if      (msg.type === 'init')            msg.photos.forEach(p => enqueue(p));
       else if (msg.type === 'new_photo')       { enqueue(msg.photo); flashBadge(); }
-      else if (msg.type === 'vote')            handleVote(msg);
       else if (msg.type === 'start_roulette')  startRoulette();
       else if (msg.type === 'skip_photo')      skipPhoto();
     };
@@ -739,9 +632,6 @@
     vignette.classList.remove('visible');
     document.getElementById('corona-sun-photo').classList.remove('visible');
 
-    Object.keys(voteCounts).forEach(k => voteCounts[k] = 0);
-    updateVoteDisplay();
-
     const tmp = new Image();
     tmp.onload = () => {
       img.src = '';
@@ -774,40 +664,6 @@
     timerTO = setTimeout(showNext, DISPLAY_MS);
   }
 
-  // ── Votos ────────────────────────────────────────────────────────────────
-  function handleVote(msg) {
-    if (!currentPhoto || msg.photo_id !== currentPhoto.id) return;
-    const counts = msg.counts || {};
-    Object.keys(counts).forEach(k => { voteCounts[k] = counts[k]; });
-    updateVoteDisplay(msg.emoji);
-    spawnFloatingEmoji(msg.emoji);
-    playEmojiSound(msg.emoji);
-  }
-
-  function updateVoteDisplay(pulsedEmoji) {
-    document.getElementById('v-heart').textContent = voteCounts['❤️'] || 0;
-    document.getElementById('v-fire').textContent  = voteCounts['🔥'] || 0;
-    document.getElementById('v-laugh').textContent = voteCounts['😂'] || 0;
-    document.getElementById('v-wow').textContent   = voteCounts['😮'] || 0;
-
-    if (pulsedEmoji && PILL_IDS[pulsedEmoji]) {
-      const pill = document.getElementById(PILL_IDS[pulsedEmoji]);
-      pill.classList.remove('pulse');
-      void pill.offsetWidth; // reflow
-      pill.classList.add('pulse');
-    }
-  }
-
-  function spawnFloatingEmoji(emoji) {
-    const el = document.createElement('div');
-    el.className = 'float-emoji';
-    el.textContent = emoji;
-    el.style.left   = (15 + Math.random() * 70) + 'vw';
-    el.style.bottom = '90px';
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2500);
-  }
-
   // ── Ruleta ───────────────────────────────────────────────────────────────
   async function startRoulette() {
     if (rouletteRunning) return;
@@ -820,12 +676,8 @@
 
     let photos = [];
     try {
-      const data = await fetch(`${API_BASE}/votes`).then(r => r.json());
-      photos = data.photos.filter(p => p.total_votes > 0);
-      if (!photos.length) {
-        const q = await fetch(`${API_BASE}/queue`).then(r => r.json());
-        photos = q.photos;
-      }
+      const data = await fetch(`${API_BASE}/queue`).then(r => r.json());
+      photos = data.photos;
     } catch (_) {}
 
     if (!photos.length) {
