@@ -149,6 +149,33 @@
       background: linear-gradient(90deg, transparent, rgba(244,196,48,.5), transparent);
     }
 
+    /* ── Sol de Corona (Rapunzel) ── */
+    #corona-sun {
+      position: absolute;
+      width: min(55vh, 55vw);
+      height: min(55vh, 55vw);
+      opacity: .07;
+      animation: sunRotate 60s linear infinite, sunPulse 8s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes sunRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes sunPulse  { from { opacity: .05; } to { opacity: .11; } }
+
+    /* Sol de Corona en fondo de foto */
+    #corona-sun-photo {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(90vh, 90vw);
+      height: min(90vh, 90vw);
+      opacity: 0;
+      z-index: 5;
+      pointer-events: none;
+      transition: opacity 1s;
+    }
+    #corona-sun-photo.visible { opacity: .04; }
+
     /* ── FOTO ── */
     #photoWrap {
       position: fixed; inset: 0; z-index: 3;
@@ -396,14 +423,68 @@
 
 <!-- Idle -->
 <div id="idle">
-  <div class="idle-crown">👑</div>
+  <!-- Sol de Corona SVG -->
+  <svg id="corona-sun" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="100" r="28" fill="#F4C430"/>
+    <circle cx="100" cy="100" r="22" fill="#FFE066"/>
+    <!-- 8 rayos largos -->
+    <g fill="#F4C430">
+      <polygon points="100,100 95,62 105,62"/>
+      <polygon points="100,100 95,138 105,138"/>
+      <polygon points="100,100 62,95 62,105"/>
+      <polygon points="100,100 138,95 138,105"/>
+      <polygon points="100,100 72.9,72.9 79.6,66.2"/>
+      <polygon points="100,100 127.1,127.1 120.4,133.8"/>
+      <polygon points="100,100 127.1,72.9 133.8,79.6"/>
+      <polygon points="100,100 72.9,127.1 66.2,120.4"/>
+    </g>
+    <!-- 8 rayos cortos entre los largos -->
+    <g fill="#FDE68A" opacity=".7">
+      <polygon points="100,100 97,74 103,74"/>
+      <polygon points="100,100 97,126 103,126"/>
+      <polygon points="100,100 74,97 74,103"/>
+      <polygon points="100,100 126,97 126,103"/>
+      <polygon points="100,100 78.8,78.8 83.5,74.1"/>
+      <polygon points="100,100 121.2,121.2 116.5,125.9"/>
+      <polygon points="100,100 121.2,78.8 125.9,83.5"/>
+      <polygon points="100,100 78.8,121.2 74.1,116.5"/>
+    </g>
+    <circle cx="100" cy="100" r="14" fill="#FFE066" opacity=".9"/>
+    <circle cx="100" cy="100" r="8"  fill="#FFF4A0"/>
+  </svg>
+
   <div class="idle-title">XV de Lola</div>
-  <div class="idle-subtitle">Una noche para recordar</div>
+  <div class="idle-subtitle">Al fin veo la luz</div>
   <div class="idle-divider">✦</div>
 </div>
 
 <!-- Foto -->
 <div id="photoWrap"><img id="photoImg" src="" alt="" /></div>
+<svg id="corona-sun-photo" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="100" r="28" fill="#F4C430"/>
+  <g fill="#F4C430">
+    <polygon points="100,100 95,62 105,62"/>
+    <polygon points="100,100 95,138 105,138"/>
+    <polygon points="100,100 62,95 62,105"/>
+    <polygon points="100,100 138,95 138,105"/>
+    <polygon points="100,100 72.9,72.9 79.6,66.2"/>
+    <polygon points="100,100 127.1,127.1 120.4,133.8"/>
+    <polygon points="100,100 127.1,72.9 133.8,79.6"/>
+    <polygon points="100,100 72.9,127.1 66.2,120.4"/>
+  </g>
+  <g fill="#FDE68A" opacity=".7">
+    <polygon points="100,100 97,74 103,74"/>
+    <polygon points="100,100 97,126 103,126"/>
+    <polygon points="100,100 74,97 74,103"/>
+    <polygon points="100,100 126,97 126,103"/>
+    <polygon points="100,100 78.8,78.8 83.5,74.1"/>
+    <polygon points="100,100 121.2,121.2 116.5,125.9"/>
+    <polygon points="100,100 121.2,78.8 125.9,83.5"/>
+    <polygon points="100,100 78.8,121.2 74.1,116.5"/>
+  </g>
+  <circle cx="100" cy="100" r="14" fill="#FFE066" opacity=".9"/>
+  <circle cx="100" cy="100" r="8"  fill="#FFF4A0"/>
+</svg>
 <div id="vignette"></div>
 
 <!-- Top bar -->
@@ -643,6 +724,7 @@
       document.getElementById('idle').classList.remove('hidden');
       document.getElementById('photoImg').classList.remove('visible');
       document.getElementById('vignette').classList.remove('visible');
+      document.getElementById('corona-sun-photo').classList.remove('visible');
       if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: 'now_showing', photo: null }));
     }
   }
@@ -655,6 +737,7 @@
     document.getElementById('idle').classList.add('hidden');
     img.classList.remove('visible');
     vignette.classList.remove('visible');
+    document.getElementById('corona-sun-photo').classList.remove('visible');
 
     Object.keys(voteCounts).forEach(k => voteCounts[k] = 0);
     updateVoteDisplay();
@@ -666,6 +749,7 @@
       requestAnimationFrame(() => requestAnimationFrame(() => {
         img.classList.add('visible');
         vignette.classList.add('visible');
+        document.getElementById('corona-sun-photo').classList.add('visible');
       }));
     };
     tmp.onerror = () => setTimeout(showNext, 800);
