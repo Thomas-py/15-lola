@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>XV de Lola — Pantalla</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <title>XV de Lola</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -12,193 +12,489 @@
       --lavender: #B39DDB;
       --gold:     #F4C430;
       --gold2:    #E8A020;
+      --gold3:    #FDE68A;
       --pink:     #E8A0B4;
-      --bg:       #1C0F3F;
+      --bg:       #0E0820;
+      --bg2:      #1C0F3F;
     }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Lato', sans-serif; color: #fff; cursor: none; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: 'Lato', sans-serif;
+      color: #fff;
+      cursor: none;
+    }
 
-    /* Orbes */
-    .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-    .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .3; animation: drift ease-in-out infinite alternate; }
-    .orb1 { width:600px; height:600px; background:var(--purple); top:-150px; left:-100px; animation-duration:16s; }
-    .orb2 { width:400px; height:400px; background:var(--gold);   bottom:-100px; right:-80px; animation-duration:12s; opacity:.15; }
-    .orb3 { width:300px; height:300px; background:var(--pink);   top:40%; left:60%; animation-duration:10s; opacity:.2; }
-    @keyframes drift { from { transform:translate(0,0) scale(1); } to { transform:translate(50px,30px) scale(1.08); } }
+    /* ── Fondo base ── */
+    #bg-gradient {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 0%,   rgba(123,94,167,.45) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 85% 100%,  rgba(244,196,48,.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 60% 50%,   rgba(232,160,180,.08) 0%, transparent 60%),
+        var(--bg);
+      animation: bgShift 20s ease-in-out infinite alternate;
+    }
+    @keyframes bgShift {
+      0%   { filter: hue-rotate(0deg)   brightness(1); }
+      50%  { filter: hue-rotate(8deg)   brightness(1.05); }
+      100% { filter: hue-rotate(-5deg)  brightness(.98); }
+    }
 
-    /* Linternas */
-    .lanterns { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-    .lantern { position: absolute; border-radius: 50% 50% 45% 45%; opacity: 0; animation: rise linear infinite; }
-    @keyframes rise { 0% { transform:translateY(0); opacity:0; } 8% { opacity:.6; } 92% { opacity:.3; } 100% { transform:translateY(-110vh) translateX(40px); opacity:0; } }
-    .ll1 { width:28px; height:36px; background:#F4C430; bottom:-40px; left:5%;  animation-duration:14s; animation-delay:0s; }
-    .ll2 { width:22px; height:28px; background:#E8A0B4; bottom:-40px; left:18%; animation-duration:18s; animation-delay:3s; }
-    .ll3 { width:32px; height:42px; background:#F4C430; bottom:-40px; left:35%; animation-duration:11s; animation-delay:6s; }
-    .ll4 { width:18px; height:24px; background:#B39DDB; bottom:-40px; left:52%; animation-duration:16s; animation-delay:1s; }
-    .ll5 { width:26px; height:34px; background:#F4C430; bottom:-40px; left:68%; animation-duration:13s; animation-delay:4s; }
-    .ll6 { width:20px; height:26px; background:#E8A0B4; bottom:-40px; left:82%; animation-duration:19s; animation-delay:7s; }
-    .ll7 { width:24px; height:30px; background:#F4C430; bottom:-40px; left:92%; animation-duration:10s; animation-delay:2s; }
+    /* ── Estrellas (generadas por JS) ── */
+    #stars { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
-    /* Foto */
-    #photoWrap { position:fixed; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; }
-    #photoImg { max-width:100%; max-height:100%; object-fit:contain; opacity:0; transition:opacity .8s ease; box-shadow:0 0 80px rgba(0,0,0,.7); }
+    /* ── Linternas ── */
+    .lanterns { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+    .lantern {
+      position: absolute;
+      border-radius: 45% 45% 50% 50%;
+      opacity: 0;
+      animation: lanternRise linear infinite;
+      filter: blur(.5px);
+    }
+    .lantern::after {
+      content: '';
+      position: absolute;
+      bottom: -6px; left: 50%;
+      transform: translateX(-50%);
+      width: 3px; height: 8px;
+      background: rgba(255,255,255,.3);
+      border-radius: 2px;
+    }
+    @keyframes lanternRise {
+      0%   { transform: translateY(0)        translateX(0);   opacity: 0; }
+      8%   { opacity: .85; }
+      50%  { transform: translateY(-50vh)    translateX(20px); }
+      92%  { opacity: .4; }
+      100% { transform: translateY(-115vh)   translateX(-10px); opacity: 0; }
+    }
+    .l1  { width:30px;  height:40px;  background:linear-gradient(160deg,#FFE066,#F4C430); bottom:-50px; left:3%;   animation-duration:14s;  animation-delay:0s; }
+    .l2  { width:22px;  height:29px;  background:linear-gradient(160deg,#F9A8C9,#E8A0B4); bottom:-50px; left:9%;   animation-duration:19s;  animation-delay:3s; }
+    .l3  { width:36px;  height:48px;  background:linear-gradient(160deg,#FFE066,#F4C430); bottom:-50px; left:17%;  animation-duration:12s;  animation-delay:7s; }
+    .l4  { width:20px;  height:27px;  background:linear-gradient(160deg,#C9B8F0,#B39DDB); bottom:-50px; left:26%;  animation-duration:17s;  animation-delay:1s; }
+    .l5  { width:28px;  height:37px;  background:linear-gradient(160deg,#FFE066,#F4C430); bottom:-50px; left:34%;  animation-duration:11s;  animation-delay:5s; }
+    .l6  { width:18px;  height:24px;  background:linear-gradient(160deg,#F9A8C9,#E8A0B4); bottom:-50px; left:43%;  animation-duration:20s;  animation-delay:9s; }
+    .l7  { width:34px;  height:45px;  background:linear-gradient(160deg,#FFE066,#E8A020); bottom:-50px; left:52%;  animation-duration:13s;  animation-delay:2s; }
+    .l8  { width:24px;  height:32px;  background:linear-gradient(160deg,#C9B8F0,#B39DDB); bottom:-50px; left:61%;  animation-duration:16s;  animation-delay:6s; }
+    .l9  { width:26px;  height:35px;  background:linear-gradient(160deg,#FFE066,#F4C430); bottom:-50px; left:70%;  animation-duration:10s;  animation-delay:4s; }
+    .l10 { width:19px;  height:26px;  background:linear-gradient(160deg,#F9A8C9,#E8A0B4); bottom:-50px; left:79%;  animation-duration:18s;  animation-delay:8s; }
+    .l11 { width:32px;  height:43px;  background:linear-gradient(160deg,#FFE066,#F4C430); bottom:-50px; left:87%;  animation-duration:15s;  animation-delay:0s; }
+    .l12 { width:21px;  height:28px;  background:linear-gradient(160deg,#C9B8F0,#B39DDB); bottom:-50px; left:94%;  animation-duration:21s;  animation-delay:11s; }
+
+    /* ── IDLE ── */
+    #idle {
+      position: fixed; inset: 0; z-index: 20;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0;
+      transition: opacity 1.2s ease;
+    }
+    #idle.hidden { opacity: 0; pointer-events: none; }
+
+    .idle-crown {
+      font-size: 5rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 40px rgba(244,196,48,.7));
+      animation: crownFloat 5s ease-in-out infinite;
+      margin-bottom: 28px;
+    }
+    @keyframes crownFloat {
+      0%,100% { transform: translateY(0)    rotate(-4deg) scale(1); }
+      50%      { transform: translateY(-18px) rotate(4deg) scale(1.06); }
+    }
+
+    .idle-title {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      font-weight: 700;
+      color: transparent;
+      background: linear-gradient(135deg, #FDE68A 0%, #F4C430 40%, #E8A020 70%, #FDE68A 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      text-shadow: none;
+      letter-spacing: .12em;
+      text-align: center;
+      line-height: 1.1;
+      animation: shimmer 4s linear infinite;
+      filter: drop-shadow(0 0 60px rgba(244,196,48,.35));
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .idle-subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(.9rem, 2vw, 1.4rem);
+      color: rgba(179,157,219,.8);
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      margin-top: 16px;
+      font-weight: 400;
+    }
+
+    .idle-divider {
+      display: flex; align-items: center; gap: 18px;
+      margin-top: 32px; margin-bottom: 0;
+      color: var(--gold); font-size: 1.2rem;
+      opacity: .6;
+    }
+    .idle-divider::before,
+    .idle-divider::after {
+      content: '';
+      width: min(180px, 20vw); height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(244,196,48,.5), transparent);
+    }
+
+    /* ── FOTO ── */
+    #photoWrap {
+      position: fixed; inset: 0; z-index: 3;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #photoImg {
+      max-width: 92vw; max-height: 92vh;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 1s ease;
+      border-radius: 4px;
+      filter: drop-shadow(0 8px 60px rgba(0,0,0,.8)) drop-shadow(0 0 2px rgba(244,196,48,.15));
+    }
     #photoImg.visible { opacity: 1; }
-    #vignette { position:fixed; inset:0; z-index:3; background:radial-gradient(ellipse at center, transparent 50%, rgba(28,15,63,.7) 100%); pointer-events:none; opacity:0; transition:opacity .8s; }
+
+    /* Viñeta */
+    #vignette {
+      position: fixed; inset: 0; z-index: 4;
+      background:
+        radial-gradient(ellipse 110% 110% at 50% 50%, transparent 55%, rgba(14,8,32,.75) 100%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1s;
+    }
     #vignette.visible { opacity: 1; }
 
-    /* Barra superior */
-    #topBar { position:fixed; top:0; left:0; right:0; z-index:10; padding:24px 40px; display:flex; justify-content:space-between; align-items:flex-start; background:linear-gradient(to bottom, rgba(28,15,63,.9), transparent); }
-    .event-name { font-family:'Cinzel',serif; font-size:1.5rem; font-weight:700; color:var(--gold); text-shadow:0 0 20px rgba(244,196,48,.5); letter-spacing:.08em; }
-    .event-sub { font-size:.75rem; color:rgba(179,157,219,.7); margin-top:4px; letter-spacing:.08em; text-transform:uppercase; font-weight:300; }
-    #photoCount { text-align:right; }
-    #photoCount .label { font-size:.7rem; color:rgba(255,255,255,.4); text-transform:uppercase; letter-spacing:.1em; }
-    #photoCount span { display:block; font-family:'Cinzel',serif; font-size:2rem; font-weight:700; color:rgba(255,255,255,.8); line-height:1; }
+    /* ── TOP BAR ── */
+    #topBar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+      padding: 28px 44px 60px;
+      background: linear-gradient(to bottom, rgba(14,8,32,.82) 0%, transparent 100%);
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .event-name {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1rem, 2vw, 1.6rem);
+      font-weight: 600;
+      color: var(--gold3);
+      letter-spacing: .15em;
+      text-shadow: 0 0 30px rgba(244,196,48,.4);
+    }
+    .event-name .ornament { opacity: .6; }
 
-    /* Barra inferior */
-    #bottomBar { position:fixed; bottom:0; left:0; right:0; z-index:10; padding:40px; background:linear-gradient(to top, rgba(28,15,63,.85), transparent); display:flex; justify-content:space-between; align-items:flex-end; }
-    .qr-hint { display:flex; align-items:center; gap:14px; background:rgba(255,255,255,.07); backdrop-filter:blur(12px); border:1px solid rgba(244,196,48,.2); border-radius:16px; padding:14px 20px; }
-    .qr-icon { font-size:2rem; }
-    .qr-text { font-size:.8rem; line-height:1.5; color:rgba(255,255,255,.8); }
-    .qr-text strong { display:block; font-size:.95rem; color:var(--gold); }
+    #photoCount {
+      text-align: right;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+    }
+    .count-label {
+      font-size: .65rem;
+      color: rgba(179,157,219,.5);
+      text-transform: uppercase;
+      letter-spacing: .15em;
+    }
+    .count-num {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 700;
+      color: rgba(255,255,255,.75);
+      line-height: 1;
+    }
 
-    /* Votos en pantalla */
-    #voteBar { display:flex; gap:16px; align-items:center; }
-    .vote-pill { background:rgba(255,255,255,.1); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.15); border-radius:99px; padding:8px 16px; font-size:1.1rem; display:flex; align-items:center; gap:6px; transition:transform .2s; }
-    .vote-pill .cnt { font-size:.85rem; font-weight:700; color:rgba(255,255,255,.9); }
+    /* ── BOTTOM: VOTOS ── */
+    #bottomBar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+      padding: 60px 44px 20px;
+      background: linear-gradient(to top, rgba(14,8,32,.8) 0%, transparent 100%);
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    #voteBar {
+      display: flex; gap: 20px; align-items: center;
+    }
+    .vote-pill {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      background: rgba(255,255,255,.07);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px;
+      padding: 12px 22px;
+      min-width: 70px;
+      transition: transform .2s, background .3s, border-color .3s, box-shadow .3s;
+    }
+    .vote-pill.pulse {
+      animation: votePulse .45s ease-out;
+    }
+    @keyframes votePulse {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+    .vote-emoji { font-size: 1.8rem; line-height: 1; }
+    .vote-cnt {
+      font-family: 'Cinzel', serif;
+      font-size: .9rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.85);
+      min-width: 1ch;
+      text-align: center;
+    }
 
-    /* Emojis flotantes */
-    .float-emoji { position:fixed; z-index:50; font-size:2.5rem; pointer-events:none; animation:floatUp 2s ease-out forwards; }
-    @keyframes floatUp { 0% { transform:translateY(0) scale(1); opacity:1; } 100% { transform:translateY(-200px) scale(1.4); opacity:0; } }
+    /* ── Emojis flotantes ── */
+    .float-emoji {
+      position: fixed; z-index: 50;
+      font-size: 3rem;
+      pointer-events: none;
+      animation: floatUp 2.4s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(0)    scale(1);   opacity: 1; }
+      30%  { transform: translateY(-80px) scale(1.2); opacity: 1; }
+      100% { transform: translateY(-260px) scale(.8); opacity: 0; }
+    }
 
-    /* Timer */
-    #timerBar { position:fixed; bottom:0; left:0; right:0; height:3px; z-index:11; background:rgba(255,255,255,.08); }
-    #timerFill { height:100%; background:linear-gradient(90deg, var(--purple), var(--gold)); }
+    /* ── Timer ── */
+    #timerBar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 2px; z-index: 12;
+    }
+    #timerFill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), #9B7FC7, var(--gold));
+      box-shadow: 0 0 8px rgba(244,196,48,.6);
+    }
 
-    /* Badge */
-    #newBadge { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); background:linear-gradient(135deg,var(--purple),var(--gold2)); color:#fff; font-size:1rem; font-weight:700; padding:12px 30px; border-radius:99px; z-index:30; pointer-events:none; transition:transform .35s cubic-bezier(.175,.885,.32,1.275), opacity .3s; opacity:0; letter-spacing:.05em; }
-    #newBadge.show { transform:translate(-50%,-50%) scale(1); opacity:1; }
-
-    /* Idle */
-    #idle { position:fixed; inset:0; z-index:20; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; background:var(--bg); transition:opacity .8s; }
-    #idle.hidden { opacity:0; pointer-events:none; }
-    .idle-sun { font-size:80px; animation:float 4s ease-in-out infinite; filter:drop-shadow(0 0 30px rgba(244,196,48,.5)); }
-    @keyframes float { 0%,100% { transform:translateY(0) rotate(-3deg); } 50% { transform:translateY(-14px) rotate(3deg); } }
-    .idle-title { font-family:'Cinzel',serif; font-size:3rem; font-weight:700; color:var(--gold); text-shadow:0 0 40px rgba(244,196,48,.5); letter-spacing:.1em; text-align:center; }
-    .idle-flowers { font-size:1.5rem; letter-spacing:.3em; opacity:.7; }
-    .idle-sub { font-size:1rem; color:var(--lavender); text-align:center; font-weight:300; letter-spacing:.05em; }
+    /* ── Badge nueva foto ── */
+    #newBadge {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%,-50%) scale(0) rotate(-6deg);
+      background: linear-gradient(135deg, rgba(123,94,167,.9), rgba(28,15,63,.95));
+      border: 1px solid rgba(244,196,48,.4);
+      color: var(--gold3);
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 14px 36px;
+      border-radius: 99px;
+      z-index: 40;
+      pointer-events: none;
+      transition: transform .4s cubic-bezier(.175,.885,.32,1.275), opacity .3s;
+      opacity: 0;
+      letter-spacing: .08em;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 40px rgba(244,196,48,.2);
+    }
+    #newBadge.show {
+      transform: translate(-50%,-50%) scale(1) rotate(0deg);
+      opacity: 1;
+    }
 
     /* ── RULETA ── */
-    #roulette { position:fixed; inset:0; z-index:100; background:rgba(28,15,63,.97); display:none; flex-direction:column; align-items:center; justify-content:center; gap:32px; }
-    #roulette.show { display:flex; }
+    #roulette {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(8,4,20,.97);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+    }
+    #roulette.show { display: flex; }
 
-    .roulette-title { font-family:'Cinzel',serif; font-size:2.5rem; color:var(--gold); text-shadow:0 0 40px rgba(244,196,48,.6); letter-spacing:.1em; text-align:center; }
+    .roulette-title {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-size: clamp(1.6rem, 4vw, 3rem);
+      color: transparent;
+      background: linear-gradient(135deg, #FDE68A, #F4C430, #E8A020);
+      -webkit-background-clip: text;
+      background-clip: text;
+      letter-spacing: .12em;
+      text-align: center;
+      filter: drop-shadow(0 0 30px rgba(244,196,48,.5));
+    }
 
     #rouletteFrame {
-      width: min(70vh, 70vw);
-      height: min(70vh, 70vw);
-      border-radius: 20px;
-      border: 3px solid rgba(244,196,48,.4);
+      width: min(68vh, 68vw);
+      height: min(68vh, 68vw);
+      border-radius: 16px;
+      border: 2px solid rgba(244,196,48,.35);
       overflow: hidden;
       position: relative;
-      box-shadow: 0 0 60px rgba(244,196,48,.2);
+      box-shadow:
+        0 0 0 1px rgba(244,196,48,.1),
+        0 0 80px rgba(244,196,48,.15),
+        0 30px 80px rgba(0,0,0,.8);
     }
-    #rouletteImg { width:100%; height:100%; object-fit:cover; transition: none; }
+    #rouletteImg { width:100%; height:100%; object-fit:cover; }
 
-    .roulette-sub { font-size:1rem; color:var(--lavender); text-align:center; font-weight:300; }
+    .roulette-sub {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      color: var(--lavender);
+      text-align: center;
+      letter-spacing: .08em;
+    }
 
     #winnerBanner {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      background: linear-gradient(to top, rgba(28,15,63,.95), transparent);
-      padding: 24px;
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(8,4,20,.97) 0%, rgba(8,4,20,.6) 60%, transparent 100%);
+      padding: 32px 24px 24px;
       text-align: center;
       display: none;
     }
-    #winnerBanner.show { display: block; animation: fadeIn .6s; }
-    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-    .winner-label { font-family:'Cinzel',serif; font-size:1.8rem; color:var(--gold); text-shadow:0 0 30px rgba(244,196,48,.7); }
-    .winner-votes { font-size:1rem; color:var(--lavender); margin-top:6px; }
+    #winnerBanner.show { display: block; animation: fadeIn .8s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 
-    .roulette-hint { position:fixed; bottom:20px; right:24px; font-size:.7rem; color:rgba(255,255,255,.2); z-index:11; }
+    .winner-label {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      color: var(--gold3);
+      filter: drop-shadow(0 0 20px rgba(244,196,48,.7));
+      letter-spacing: .08em;
+    }
 
-    /* ── Indicador WS ── */
-    #wsIndicator { position:fixed; top:12px; right:16px; z-index:200; display:flex; align-items:center; gap:6px; font-size:.65rem; color:rgba(255,255,255,.4); opacity:0; transition:opacity .4s; }
-    #wsIndicator.show { opacity:1; }
-    #wsDot { width:7px; height:7px; border-radius:50%; background:#ff5555; animation:blink 1s ease-in-out infinite; }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+    /* ── WS Indicador ── */
+    #wsIndicator {
+      position: fixed; bottom: 14px; left: 20px;
+      z-index: 200;
+      display: flex; align-items: center; gap: 6px;
+      font-size: .65rem;
+      color: rgba(255,255,255,.35);
+      opacity: 0;
+      transition: opacity .4s;
+    }
+    #wsIndicator.show { opacity: 1; }
+    #wsDot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #ff5555;
+      animation: blink 1s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
   </style>
 </head>
 <body>
 
-<div class="bg-orbs">
-  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
-</div>
+<div id="bg-gradient"></div>
+<canvas id="stars"></canvas>
+
 <div class="lanterns">
-  <div class="lantern ll1"></div><div class="lantern ll2"></div><div class="lantern ll3"></div>
-  <div class="lantern ll4"></div><div class="lantern ll5"></div><div class="lantern ll6"></div>
-  <div class="lantern ll7"></div>
+  <div class="lantern l1"></div><div class="lantern l2"></div><div class="lantern l3"></div>
+  <div class="lantern l4"></div><div class="lantern l5"></div><div class="lantern l6"></div>
+  <div class="lantern l7"></div><div class="lantern l8"></div><div class="lantern l9"></div>
+  <div class="lantern l10"></div><div class="lantern l11"></div><div class="lantern l12"></div>
 </div>
 
 <!-- Idle -->
 <div id="idle">
-  <div class="idle-sun">✨</div>
+  <div class="idle-crown">👑</div>
   <div class="idle-title">XV de Lola</div>
-  <div class="idle-flowers">🌸 🌸 🌸</div>
-  <div class="idle-sub">Escaneá el QR y enviá tu foto</div>
+  <div class="idle-subtitle">Una noche para recordar</div>
+  <div class="idle-divider">✦</div>
 </div>
 
 <!-- Foto -->
 <div id="photoWrap"><img id="photoImg" src="" alt="" /></div>
 <div id="vignette"></div>
 
-<!-- Top -->
+<!-- Top bar -->
 <div id="topBar">
-  <div>
-    <div class="event-name">✦ XV de Lola ✦</div>
-    <div class="event-sub">Fotos del festejo</div>
+  <div class="event-name">
+    <span class="ornament">✦ </span>XV de Lola<span class="ornament"> ✦</span>
   </div>
   <div id="photoCount">
-    <div class="label">Fotos</div>
-    <span id="countNum">0</span>
+    <div class="count-label">Fotos</div>
+    <div class="count-num" id="countNum">0</div>
   </div>
 </div>
 
-<!-- Bottom -->
+<!-- Bottom bar: votos -->
 <div id="bottomBar">
-  <div class="qr-hint">
-    <div class="qr-icon">📷</div>
-    <div class="qr-text">
-      <strong>¡Sumate!</strong>Escaneá el QR y enviá tu foto
-    </div>
-  </div>
   <div id="voteBar">
-    <div class="vote-pill">❤️ <span class="cnt" id="v-heart">0</span></div>
-    <div class="vote-pill">🔥 <span class="cnt" id="v-fire">0</span></div>
-    <div class="vote-pill">😂 <span class="cnt" id="v-laugh">0</span></div>
-    <div class="vote-pill">😮 <span class="cnt" id="v-wow">0</span></div>
+    <div class="vote-pill" id="pill-heart">
+      <div class="vote-emoji">❤️</div>
+      <div class="vote-cnt" id="v-heart">0</div>
+    </div>
+    <div class="vote-pill" id="pill-fire">
+      <div class="vote-emoji">🔥</div>
+      <div class="vote-cnt" id="v-fire">0</div>
+    </div>
+    <div class="vote-pill" id="pill-laugh">
+      <div class="vote-emoji">😂</div>
+      <div class="vote-cnt" id="v-laugh">0</div>
+    </div>
+    <div class="vote-pill" id="pill-wow">
+      <div class="vote-emoji">😮</div>
+      <div class="vote-cnt" id="v-wow">0</div>
+    </div>
   </div>
 </div>
 
 <div id="timerBar"><div id="timerFill" style="width:100%"></div></div>
-<div id="newBadge">🏮 Nueva foto</div>
+<div id="newBadge">🏮 &nbsp;Nueva foto</div>
 
 <!-- Ruleta -->
 <div id="roulette">
-  <div class="roulette-title">✨ Foto Ganadora ✨</div>
+  <div class="roulette-title">✨ La Foto Elegida ✨</div>
   <div id="rouletteFrame">
     <img id="rouletteImg" src="" alt="" />
     <div id="winnerBanner">
-      <div class="winner-label" id="winnerLabel">🏆 ¡La elegida!</div>
-      <div class="winner-votes" id="winnerVotes"></div>
+      <div class="winner-label" id="winnerLabel">🏆 &nbsp;¡La elegida!</div>
     </div>
   </div>
   <div class="roulette-sub" id="rouletteSub">Girando...</div>
 </div>
 
 <div id="wsIndicator"><div id="wsDot"></div> Reconectando...</div>
-<div class="roulette-hint">F = Fullscreen · ESC = Cerrar ruleta</div>
 
 <script>
   const API_BASE  = window.location.origin;
   const WS_URL    = API_BASE.replace(/^http/, 'ws') + '/ws/screen';
+
+  // ── Estrellas ────────────────────────────────────────────────────────────
+  (function initStars() {
+    const canvas = document.getElementById('stars');
+    const ctx    = canvas.getContext('2d');
+    let stars    = [];
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      stars = Array.from({ length: 180 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.2 + .2,
+        a: Math.random(),
+        speed: Math.random() * .008 + .003,
+        phase: Math.random() * Math.PI * 2,
+      }));
+    }
+
+    function draw(t) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.a = .3 + .5 * Math.abs(Math.sin(s.phase + t * s.speed));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(253,230,138,${s.a})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    requestAnimationFrame(draw);
+  })();
 
   // ── Audio ─────────────────────────────────────────────────────────────────
   const AC = new (window.AudioContext || window.webkitAudioContext)();
@@ -219,7 +515,7 @@
   }
 
   function playNoise(dur = 0.12, vol = 0.08) {
-    const buf = AC.createBuffer(1, AC.sampleRate * dur, AC.sampleRate);
+    const buf  = AC.createBuffer(1, AC.sampleRate * dur, AC.sampleRate);
     const data = buf.getChannelData(0);
     for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
     const src = AC.createBufferSource();
@@ -248,7 +544,6 @@
     EMOJI_SOUNDS[emoji]?.();
   }
 
-  let rouletteTickInterval = null;
   function playRouletteTick(fast = true) {
     if (AC.state === 'suspended') AC.resume();
     playTone([{ f: fast ? 1200 : 800 }], fast ? 0.04 : 0.07, 'square', 0.08);
@@ -256,50 +551,51 @@
 
   function playRouletteWin() {
     if (AC.state === 'suspended') AC.resume();
-    // Fanfarria: Do Mi Sol Do (ascendente)
     playTone([
       { f:523, t:0,   d:.18 },
       { f:659, t:.18, d:.18 },
       { f:784, t:.36, d:.18 },
       { f:1047,t:.54, d:.5  },
     ], .18, 'sine', .2);
-    // Acorde de fondo
     playTone([
       { f:262, t:.54, d:.5 },
       { f:330, t:.54, d:.5 },
       { f:392, t:.54, d:.5 },
     ], .5, 'triangle', .08);
   }
+
+  // ── Estado ───────────────────────────────────────────────────────────────
   const DISPLAY_MS = 8000;
   const POLL_MS    = 5000;
 
   const queue    = [];
-  const history  = [];   // fotos ya mostradas
-  let showing      = false;
-  let totalCount   = 0;
-  let wsReady      = false;
-  let timerTO      = null;
-  let currentPhoto = null;
-  let ws           = null;
-  let rouletteRunning = false;  // evita doble disparo
+  const history  = [];
+  let showing         = false;
+  let totalCount      = 0;
+  let wsReady         = false;
+  let timerTO         = null;
+  let currentPhoto    = null;
+  let ws              = null;
+  let rouletteRunning = false;
   const knownIds = new Set();
 
-  // Contadores de votos de la foto actual
   const voteCounts = { '❤️': 0, '🔥': 0, '😂': 0, '😮': 0 };
+  const PILL_IDS   = { '❤️': 'pill-heart', '🔥': 'pill-fire', '😂': 'pill-laugh', '😮': 'pill-wow' };
 
+  // ── WebSocket ────────────────────────────────────────────────────────────
   function connectWS() {
     ws = new WebSocket(WS_URL);
-    ws.onopen  = () => {
+    ws.onopen = () => {
       wsReady = true;
       document.getElementById('wsIndicator').classList.remove('show');
     };
     ws.onmessage = e => {
       const msg = JSON.parse(e.data);
-      if (msg.type === 'init')           msg.photos.forEach(p => enqueue(p));
-      else if (msg.type === 'new_photo') { enqueue(msg.photo); flashBadge(); }
-      else if (msg.type === 'vote')         handleVote(msg);
-      else if (msg.type === 'start_roulette') startRoulette();
-      else if (msg.type === 'skip_photo')    skipPhoto();
+      if      (msg.type === 'init')            msg.photos.forEach(p => enqueue(p));
+      else if (msg.type === 'new_photo')       { enqueue(msg.photo); flashBadge(); }
+      else if (msg.type === 'vote')            handleVote(msg);
+      else if (msg.type === 'start_roulette')  startRoulette();
+      else if (msg.type === 'skip_photo')      skipPhoto();
     };
     ws.onclose = () => {
       wsReady = false;
@@ -318,6 +614,7 @@
   }
   setTimeout(() => { if (!wsReady) { pollQueue(); setInterval(pollQueue, POLL_MS); } }, 5000);
 
+  // ── Cola ─────────────────────────────────────────────────────────────────
   function enqueue(photo) {
     if (knownIds.has(photo.id)) return;
     knownIds.add(photo.id);
@@ -336,15 +633,11 @@
   function skipPhoto() {
     if (timerTO) { clearTimeout(timerTO); timerTO = null; }
     if (queue.length > 0) {
-      // Hay fotos pendientes → siguiente
       showing = true;
       displayPhoto(queue.shift());
     } else if (history.length > 1) {
-      // No hay pendientes → volver a la anterior
-      const prev = history[history.length - 2];
-      displayPhoto(prev);
+      displayPhoto(history[history.length - 2]);
     } else {
-      // Nada que mostrar
       showing = false;
       currentPhoto = null;
       document.getElementById('idle').classList.remove('hidden');
@@ -363,13 +656,11 @@
     img.classList.remove('visible');
     vignette.classList.remove('visible');
 
-    // Resetear contadores de votos
     Object.keys(voteCounts).forEach(k => voteCounts[k] = 0);
     updateVoteDisplay();
 
     const tmp = new Image();
     tmp.onload = () => {
-      // Liberar referencia anterior para ayudar al GC del navegador
       img.src = '';
       img.src = API_BASE + photo.url;
       requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -380,12 +671,10 @@
     tmp.onerror = () => setTimeout(showNext, 800);
     tmp.src = API_BASE + photo.url;
 
-    // Guardar en historial (evitar duplicados consecutivos)
     if (!history.length || history[history.length - 1].id !== photo.id) {
       history.push(photo);
     }
 
-    // Avisar al backend qué foto se está mostrando
     currentPhoto = photo;
     if (ws && ws.readyState === 1) {
       ws.send(JSON.stringify({ type: 'now_showing', photo }));
@@ -406,32 +695,40 @@
     if (!currentPhoto || msg.photo_id !== currentPhoto.id) return;
     const counts = msg.counts || {};
     Object.keys(counts).forEach(k => { voteCounts[k] = counts[k]; });
-    updateVoteDisplay();
+    updateVoteDisplay(msg.emoji);
     spawnFloatingEmoji(msg.emoji);
     playEmojiSound(msg.emoji);
   }
 
-  function updateVoteDisplay() {
+  function updateVoteDisplay(pulsedEmoji) {
     document.getElementById('v-heart').textContent = voteCounts['❤️'] || 0;
     document.getElementById('v-fire').textContent  = voteCounts['🔥'] || 0;
     document.getElementById('v-laugh').textContent = voteCounts['😂'] || 0;
     document.getElementById('v-wow').textContent   = voteCounts['😮'] || 0;
+
+    if (pulsedEmoji && PILL_IDS[pulsedEmoji]) {
+      const pill = document.getElementById(PILL_IDS[pulsedEmoji]);
+      pill.classList.remove('pulse');
+      void pill.offsetWidth; // reflow
+      pill.classList.add('pulse');
+    }
   }
 
   function spawnFloatingEmoji(emoji) {
     const el = document.createElement('div');
     el.className = 'float-emoji';
     el.textContent = emoji;
-    el.style.left  = (20 + Math.random() * 60) + 'vw';
-    el.style.bottom = '120px';
+    el.style.left   = (15 + Math.random() * 70) + 'vw';
+    el.style.bottom = '90px';
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2100);
+    setTimeout(() => el.remove(), 2500);
   }
 
   // ── Ruleta ───────────────────────────────────────────────────────────────
   async function startRoulette() {
     if (rouletteRunning) return;
     rouletteRunning = true;
+
     const overlay = document.getElementById('roulette');
     overlay.classList.add('show');
     document.getElementById('winnerBanner').classList.remove('show');
@@ -442,7 +739,6 @@
       const data = await fetch(`${API_BASE}/votes`).then(r => r.json());
       photos = data.photos.filter(p => p.total_votes > 0);
       if (!photos.length) {
-        // Si no hay votos, usar todas las fotos
         const q = await fetch(`${API_BASE}/queue`).then(r => r.json());
         photos = q.photos;
       }
@@ -454,10 +750,9 @@
       return;
     }
 
-    // Girar: cambiar foto rápido por 4 segundos, luego frenar
-    const img    = document.getElementById('rouletteImg');
-    const winner = photos[Math.floor(Math.random() * photos.length)]; // al azar
-    let   idx    = 0;
+    const img     = document.getElementById('rouletteImg');
+    const winner  = photos[Math.floor(Math.random() * photos.length)];
+    let   idx     = 0;
     const allUrls = photos.map(p => API_BASE + p.url);
     let   interval = 80;
     let   elapsed  = 0;
@@ -468,20 +763,16 @@
       idx++;
       elapsed += interval;
 
-      // Tick con tono más lento al frenar
       playRouletteTick(elapsed < 3000);
 
-      // Frenar progresivamente
-      if (elapsed > 3000) interval = 300;
+      if (elapsed > 3000)      interval = 300;
       else if (elapsed > 2000) interval = 180;
       else if (elapsed > 1200) interval = 120;
 
       if (elapsed > 4500) {
         clearInterval(spin);
-        // Mostrar ganadora
         img.src = API_BASE + winner.url;
         document.getElementById('rouletteSub').textContent = '';
-        document.getElementById('winnerVotes').textContent = '';
         document.getElementById('winnerBanner').classList.add('show');
         playRouletteWin();
       }
@@ -506,7 +797,7 @@
   function flashBadge() {
     const b = document.getElementById('newBadge');
     b.classList.add('show');
-    setTimeout(() => b.classList.remove('show'), 2200);
+    setTimeout(() => b.classList.remove('show'), 2400);
   }
 
   connectWS();
