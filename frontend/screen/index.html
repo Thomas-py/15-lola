@@ -446,7 +446,6 @@
 
   // ── Teclado ──────────────────────────────────────────────────────────────
   document.addEventListener('keydown', e => {
-    if (e.key === 'r' || e.key === 'R') startRoulette();
     if (e.key === 'Escape')             closeRoulette();
     if (e.key === 'f' || e.key === 'F') document.documentElement.requestFullscreen?.().catch(() => {});
   });
