@@ -451,6 +451,29 @@
       setTimeout(() => { btn.disabled = false; btn.textContent = '🎰 Iniciar Ruleta'; }, 3000);
     };
     document.body.appendChild(btn);
+
+    const skipBtn = document.createElement('button');
+    skipBtn.textContent = '⏭️ Saltar foto';
+    skipBtn.style.cssText = `
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+      z-index: 999; background: rgba(255,255,255,.12); backdrop-filter: blur(8px);
+      color: #F0E8FF; font-family: 'Lato', sans-serif; font-weight: 700;
+      font-size: .95rem; padding: 12px 28px; border: 1px solid rgba(179,157,219,.3);
+      border-radius: 50px; cursor: pointer; letter-spacing: .04em;
+      box-shadow: 0 2px 12px rgba(0,0,0,.3);
+    `;
+    skipBtn.onclick = async () => {
+      skipBtn.disabled = true;
+      skipBtn.textContent = '⏳ Saltando...';
+      try {
+        await fetch(`${API_BASE}/photo/skip`, { method: 'POST' });
+        skipBtn.textContent = '✅ Saltada';
+      } catch (_) {
+        skipBtn.textContent = '❌ Error';
+      }
+      setTimeout(() => { skipBtn.disabled = false; skipBtn.textContent = '⏭️ Saltar foto'; }, 2000);
+    };
+    document.body.appendChild(skipBtn);
   }
 </script>
 </body>

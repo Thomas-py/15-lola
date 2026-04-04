@@ -267,6 +267,7 @@
   const POLL_MS    = 5000;
 
   const queue    = [];
+  const history  = [];   // fotos ya mostradas
   let showing    = false;
   let totalCount = 0;
   let wsReady    = false;
@@ -287,6 +288,7 @@
       else if (msg.type === 'new_photo') { enqueue(msg.photo); flashBadge(); }
       else if (msg.type === 'vote')         handleVote(msg);
       else if (msg.type === 'start_roulette') startRoulette();
+      else if (msg.type === 'skip_photo')    skipPhoto();
     };
     ws.onclose = () => { wsReady = false; setTimeout(connectWS, 3000); };
     ws.onerror = () => ws.close();
@@ -316,6 +318,27 @@
     displayPhoto(queue.shift());
   }
 
+  function skipPhoto() {
+    if (timerTO) { clearTimeout(timerTO); timerTO = null; }
+    if (queue.length > 0) {
+      // Hay fotos pendientes → siguiente
+      showing = true;
+      displayPhoto(queue.shift());
+    } else if (history.length > 1) {
+      // No hay pendientes → volver a la anterior
+      const prev = history[history.length - 2];
+      displayPhoto(prev);
+    } else {
+      // Nada que mostrar
+      showing = false;
+      currentPhoto = null;
+      document.getElementById('idle').classList.remove('hidden');
+      document.getElementById('photoImg').classList.remove('visible');
+      document.getElementById('vignette').classList.remove('visible');
+      if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: 'now_showing', photo: null }));
+    }
+  }
+
   function displayPhoto(photo) {
     const img      = document.getElementById('photoImg');
     const vignette = document.getElementById('vignette');
@@ -339,6 +362,11 @@
     };
     tmp.onerror = () => setTimeout(showNext, 800);
     tmp.src = API_BASE + photo.url;
+
+    // Guardar en historial (evitar duplicados consecutivos)
+    if (!history.length || history[history.length - 1].id !== photo.id) {
+      history.push(photo);
+    }
 
     // Avisar al backend qué foto se está mostrando
     currentPhoto = photo;
