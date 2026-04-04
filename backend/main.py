@@ -212,6 +212,7 @@ async def start_roulette():
 async def skip_photo():
     """El admin saca la foto actual de pantalla."""
     await screen_mgr.broadcast({"type": "skip_photo"})
+    await mobile_mgr.broadcast({"type": "photo_skipped"})
     return JSONResponse({"ok": True})
 
 

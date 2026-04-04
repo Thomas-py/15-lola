@@ -271,9 +271,8 @@
 
     ws.onmessage = e => {
       const msg = JSON.parse(e.data);
-      if (msg.type === 'now_showing') {
-        showVoteOverlay(msg.photo);
-      }
+      if (msg.type === 'now_showing')  showVoteOverlay(msg.photo);
+      else if (msg.type === 'photo_skipped') closeVote();
     };
 
     ws.onclose = () => setTimeout(connectMobileWS, 3000);
