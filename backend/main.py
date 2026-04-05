@@ -95,8 +95,26 @@ async def upload_to_drive_bg(file_path: Path, filename: str):
 
 # ─── App ─────────────────────────────────────────────────────────────────────
 
+def _load_existing_photos():
+    """Carga las fotos ya subidas al arrancar, para que la ruleta las tenga."""
+    exts = {".jpg", ".jpeg", ".png", ".webp"}
+    files = sorted(
+        [f for f in UPLOADS_DIR.iterdir() if f.suffix.lower() in exts],
+        key=lambda f: f.stat().st_mtime,
+    )
+    for f in files:
+        photo_queue.append({
+            "id": f.stem,
+            "filename": f.name,
+            "url": f"/photos/{f.name}",
+            "ts": datetime.fromtimestamp(f.stat().st_mtime).isoformat(),
+        })
+    logger.info(f"Fotos cargadas al inicio: {len(photo_queue)}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _load_existing_photos()
     logger.info("QR-15 backend iniciado")
     yield
 
@@ -144,7 +162,7 @@ async def upload_photo(request: Request, background_tasks: BackgroundTasks, file
     logger.info(f"Foto guardada: {filename} ({len(content) // 1024} KB) — IP: {ip}")
 
     photo = {
-        "id": uuid.uuid4().hex,
+        "id": Path(filename).stem,
         "filename": filename,
         "url": f"/photos/{filename}",
         "ts": datetime.now().isoformat(),
@@ -177,15 +195,10 @@ async def start_roulette():
 
 @app.post("/photo/skip")
 async def skip_photo():
-    """El admin saca la foto actual de pantalla y la elimina de la ruleta."""
+    """El admin avanza la foto actual en pantalla. La foto queda en la cola para la ruleta."""
     global current_photo
-    if current_photo:
-        pid = current_photo["id"]
-        async with queue_lock:
-            photo_queue[:] = [p for p in photo_queue if p["id"] != pid]
-        current_photo = None
+    current_photo = None
     await screen_mgr.broadcast({"type": "skip_photo"})
-    await mobile_mgr.broadcast({"type": "photo_skipped"})
     return JSONResponse({"ok": True})
 
 
